@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Weather Search</title>
+    <link rel="stylesheet" href="hw2.css" />
+  </head>
+  <body>
+    <h1>Weather Search</h1>
+    <form id="weatherForm">
+      <label>
+        <input type="checkbox" id="useLocation" name="useLocation" />
+        Use my current location
+      </label>
+
+      <label>
+        Street:
+        <input type="text" id="street" name="street" />
+        <span class="error" id="streetError">Street is required.</span>
+      </label>
+
+      <label>
+        City:
+        <input type="text" id="city" name="city" />
+        <span class="error" id="cityError">City is required.</span>
+      </label>
+
+      <label>
+        State:
+        <select id="state" name="state">
+          <option value="">--Select State--</option>
+          <option value="AL">Alabama</option>
+          <option value="AK">Alaska</option>
+          <option value="AZ">Arizona</option>
+          <option value="AR">Arkansas</option>
+          <option value="CA">California</option>
+          <option value="CO">Colorado</option>
+          <option value="CT">Connecticut</option>
+          <option value="DE">Delaware</option>
+          <option value="DC">District Of Columbia</option>
+          <option value="FL">Florida</option>
+          <option value="GA">Georgia</option>
+          <option value="HI">Hawaii</option>
+          <option value="ID">Idaho</option>
+          <option value="IL">Illinois</option>
+          <option value="IN">Indiana</option>
+          <option value="IA">Iowa</option>
+          <option value="KS">Kansas</option>
+          <option value="KY">Kentucky</option>
+          <option value="LA">Louisiana</option>
+          <option value="ME">Maine</option>
+          <option value="MD">Maryland</option>
+          <option value="MA">Massachusetts</option>
+          <option value="MI">Michigan</option>
+          <option value="MN">Minnesota</option>
+          <option value="MS">Mississippi</option>
+          <option value="MO">Missouri</option>
+          <option value="MT">Montana</option>
+          <option value="NE">Nebraska</option>
+          <option value="NV">Nevada</option>
+          <option value="NH">New Hampshire</option>
+          <option value="NJ">New Jersey</option>
+          <option value="NM">New Mexico</option>
+          <option value="NY">New York</option>
+          <option value="NC">North Carolina</option>
+          <option value="ND">North Dakota</option>
+          <option value="OH">Ohio</option>
+          <option value="OK">Oklahoma</option>
+          <option value="OR">Oregon</option>
+          <option value="PA">Pennsylvania</option>
+          <option value="RI">Rhode Island</option>
+          <option value="SC">South Carolina</option>
+          <option value="SD">South Dakota</option>
+          <option value="TN">Tennessee</option>
+          <option value="TX">Texas</option>
+          <option value="UT">Utah</option>
+          <option value="VT">Vermont</option>
+          <option value="VA">Virginia</option>
+          <option value="WA">Washington</option>
+          <option value="WV">West Virginia</option>
+          <option value="WI">Wisconsin</option>
+          <option value="WY">Wyoming</option>
+        </select>
+        <span class="error" id="stateError">State is required.</span>
+      </label>
+
+      <div class="buttons">
+        <button type="button" id="submitBtn">SUBMIT</button>
+        <button type="button" id="clearBtn">CLEAR</button>
+      </div>
+    </form>
+
+    <div class="result" id="resultArea" style="display: none">
+      <h2>Weather Information:</h2>
+      <div id="weatherInfo"></div>
+    </div>
+
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const useLocationCheckbox = document.getElementById('useLocation')
+        const streetInput = document.getElementById('street')
+        const cityInput = document.getElementById('city')
+        const stateInput = document.getElementById('state')
+        const submitBtn = document.getElementById('submitBtn')
+        const clearBtn = document.getElementById('clearBtn')
+        const resultArea = document.getElementById('resultArea')
+        const weatherInfo = document.getElementById('weatherInfo')
+
+        // Error elements
+        const streetError = document.getElementById('streetError')
+        const cityError = document.getElementById('cityError')
+        const stateError = document.getElementById('stateError')
+
+        // Toggle input fields based on checkbox
+        useLocationCheckbox.addEventListener('change', function () {
+          if (this.checked) {
+            streetInput.value = ''
+            cityInput.value = ''
+            stateInput.value = ''
+            streetInput.disabled = true
+            cityInput.disabled = true
+            stateInput.disabled = true
+            hideAllErrors()
+          } else {
+            streetInput.disabled = false
+            cityInput.disabled = false
+            stateInput.disabled = false
+          }
+        })
+
+        // Submit button handler
+        submitBtn.addEventListener('click', function () {
+          hideAllErrors()
+          let hasError = false
+          let data = {}
+
+          if (useLocationCheckbox.checked) {
+            // Fetch geolocation from ipinfo.io
+            fetch('https://ipinfo.io/json?token=aace562e162468  ')
+              .then((response) => response.json())
+              .then((dataLocation) => {
+                const loc = dataLocation.loc.split(',')
+                data.latitude = loc[0]
+                data.longitude = loc[1]
+                sendRequest(data)
+              })
+              .catch((error) => {
+                alert('Failed to fetch location information.')
+                console.error(error)
+              })
+          } else {
+            // Validate input fields
+            if (streetInput.value.trim() === '') {
+              streetError.style.display = 'inline'
+              hasError = true
+            }
+            if (cityInput.value.trim() === '') {
+              cityError.style.display = 'inline'
+              hasError = true
+            }
+            if (stateInput.value.trim() === '') {
+              stateError.style.display = 'inline'
+              hasError = true
+            }
+
+            if (hasError) {
+              return
+            }
+
+            data.street = streetInput.value.trim()
+            data.city = cityInput.value.trim()
+            data.state = stateInput.value.trim()
+            sendRequest(data)
+          }
+        })
+
+        // Clear button handler
+        clearBtn.addEventListener('click', function () {
+          document.getElementById('weatherForm').reset()
+          streetInput.disabled = false
+          cityInput.disabled = false
+          stateInput.disabled = false
+          hideAllErrors()
+          resultArea.style.display = 'none'
+          weatherInfo.innerHTML = ''
+        })
+
+        // Function to hide all error messages
+        function hideAllErrors() {
+          streetError.style.display = 'none'
+          cityError.style.display = 'none'
+          stateError.style.display = 'none'
+        }
+
+        // Function to send request to Flask backend
+        function sendRequest(data) {
+          // Construct query parameters
+          const params = new URLSearchParams(data).toString()
+          const url = `/get_weather?${params}`
+
+          fetch(url)
+            .then((response) => response.json())
+            .then((dataResponse) => {
+              if (dataResponse.error) {
+                alert(dataResponse.error)
+              } else {
+                displayWeather(dataResponse)
+              }
+            })
+            .catch((error) => {
+              alert('An error occurred while fetching weather information.')
+              console.error(error)
+            })
+        }
+
+        // Function to display weather information
+        function displayWeather(data) {
+          let htmlContent = `<p><strong>Location:</strong> ${data.location}</p>`
+          htmlContent += `<p><strong>Temperature:</strong> ${data.temperature} °C</p>`
+          htmlContent += `<p><strong>Weather:</strong> ${data.weather}</p>`
+          weatherInfo.innerHTML = htmlContent
+          resultArea.style.display = 'block'
+        }
+      })
+    </script>
+  </body>
+</html>
