@@ -1,0 +1,16 @@
+runtime: python310
+instance_class: F1
+entrypoint: gunicorn -b :$PORT main:app
+
+automatic_scaling:
+  min_instances: 0
+  max_instances: 5
+
+handlers:
+  # Serve other static assets (CSS, JS, Images) from the /static directory
+  - url: /static
+    static_dir: static
+
+  # All other URLs are handled by the Flask application
+  - url: /.*
+    script: auto

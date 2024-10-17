@@ -10,89 +10,110 @@
     <script src="https://code.highcharts.com/modules/windbarb.js"></script>
   </head>
   <body>
-    <h1>Weather Search</h1>
-    <form id="weatherForm">
-      <label>
-        <input type="checkbox" id="useLocation" name="useLocation" />
-        Use my current location
-      </label>
-
-      <label>
-        Street:
-        <input type="text" id="street" name="street" />
-        <span class="error" id="streetError">Street is required.</span>
-      </label>
-
-      <label>
-        City:
-        <input type="text" id="city" name="city" />
-        <span class="error" id="cityError">City is required.</span>
-      </label>
-
-      <label>
-        State:
-        <select id="state" name="state">
-          <option value="">--Select State--</option>
-          <option value="AL">Alabama</option>
-          <option value="AK">Alaska</option>
-          <option value="AZ">Arizona</option>
-          <option value="AR">Arkansas</option>
-          <option value="CA">California</option>
-          <option value="CO">Colorado</option>
-          <option value="CT">Connecticut</option>
-          <option value="DE">Delaware</option>
-          <option value="DC">District Of Columbia</option>
-          <option value="FL">Florida</option>
-          <option value="GA">Georgia</option>
-          <option value="HI">Hawaii</option>
-          <option value="ID">Idaho</option>
-          <option value="IL">Illinois</option>
-          <option value="IN">Indiana</option>
-          <option value="IA">Iowa</option>
-          <option value="KS">Kansas</option>
-          <option value="KY">Kentucky</option>
-          <option value="LA">Louisiana</option>
-          <option value="ME">Maine</option>
-          <option value="MD">Maryland</option>
-          <option value="MA">Massachusetts</option>
-          <option value="MI">Michigan</option>
-          <option value="MN">Minnesota</option>
-          <option value="MS">Mississippi</option>
-          <option value="MO">Missouri</option>
-          <option value="MT">Montana</option>
-          <option value="NE">Nebraska</option>
-          <option value="NV">Nevada</option>
-          <option value="NH">New Hampshire</option>
-          <option value="NJ">New Jersey</option>
-          <option value="NM">New Mexico</option>
-          <option value="NY">New York</option>
-          <option value="NC">North Carolina</option>
-          <option value="ND">North Dakota</option>
-          <option value="OH">Ohio</option>
-          <option value="OK">Oklahoma</option>
-          <option value="OR">Oregon</option>
-          <option value="PA">Pennsylvania</option>
-          <option value="RI">Rhode Island</option>
-          <option value="SC">South Carolina</option>
-          <option value="SD">South Dakota</option>
-          <option value="TN">Tennessee</option>
-          <option value="TX">Texas</option>
-          <option value="UT">Utah</option>
-          <option value="VT">Vermont</option>
-          <option value="VA">Virginia</option>
-          <option value="WA">Washington</option>
-          <option value="WV">West Virginia</option>
-          <option value="WI">Wisconsin</option>
-          <option value="WY">Wyoming</option>
-        </select>
-        <span class="error" id="stateError">State is required.</span>
-      </label>
-
-      <div class="buttons">
-        <button type="button" id="submitBtn">SUBMIT</button>
-        <button type="button" id="clearBtn">CLEAR</button>
+    <div class="container">
+      <div class="banner">
+        <h2>Weather Search</h2>
+        <p>Fill out the form to get weather info !</p>
       </div>
-    </form>
+      <div class="form-content">
+        <form id="weatherForm">
+          <div class="input-container">
+            <label for="street">Street</label>
+            <input type="text" id="street" name="street" />
+            <div class="error-tooltip" id="streetError"
+              ><span class="error-icon">!</span>Please fill in this field.
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col">
+              <div class="input-container">
+                <label for="city">City</label>
+                <input type="text" id="city" name="city" />
+                <div class="error-tooltip" id="cityError"
+                  ><span class="error-icon">!</span>Please fill in this field.
+                </div>
+              </div>
+            </div>
+            <div class="col">
+              <div class="input-container"
+                ><label for="state">State</label>
+                <select id="state" name="state">
+                  <option value="">Select your state</option>
+
+                  <option value="AL">Alabama</option>
+                  <option value="AK">Alaska</option>
+                  <option value="AZ">Arizona</option>
+                  <option value="AR">Arkansas</option>
+                  <option value="CA">California</option>
+                  <option value="CO">Colorado</option>
+                  <option value="CT">Connecticut</option>
+                  <option value="DE">Delaware</option>
+                  <option value="DC">District Of Columbia</option>
+                  <option value="FL">Florida</option>
+                  <option value="GA">Georgia</option>
+                  <option value="HI">Hawaii</option>
+                  <option value="ID">Idaho</option>
+                  <option value="IL">Illinois</option>
+                  <option value="IN">Indiana</option>
+                  <option value="IA">Iowa</option>
+                  <option value="KS">Kansas</option>
+                  <option value="KY">Kentucky</option>
+                  <option value="LA">Louisiana</option>
+                  <option value="ME">Maine</option>
+                  <option value="MD">Maryland</option>
+                  <option value="MA">Massachusetts</option>
+                  <option value="MI">Michigan</option>
+                  <option value="MN">Minnesota</option>
+                  <option value="MS">Mississippi</option>
+                  <option value="MO">Missouri</option>
+                  <option value="MT">Montana</option>
+                  <option value="NE">Nebraska</option>
+                  <option value="NV">Nevada</option>
+                  <option value="NH">New Hampshire</option>
+                  <option value="NJ">New Jersey</option>
+                  <option value="NM">New Mexico</option>
+                  <option value="NY">New York</option>
+                  <option value="NC">North Carolina</option>
+                  <option value="ND">North Dakota</option>
+                  <option value="OH">Ohio</option>
+                  <option value="OK">Oklahoma</option>
+                  <option value="OR">Oregon</option>
+                  <option value="PA">Pennsylvania</option>
+                  <option value="RI">Rhode Island</option>
+                  <option value="SC">South Carolina</option>
+                  <option value="SD">South Dakota</option>
+                  <option value="TN">Tennessee</option>
+                  <option value="TX">Texas</option>
+                  <option value="UT">Utah</option>
+                  <option value="VT">Vermont</option>
+                  <option value="VA">Virginia</option>
+                  <option value="WA">Washington</option>
+                  <option value="WV">West Virginia</option>
+                  <option value="WI">Wisconsin</option>
+                  <option value="WY">Wyoming</option></select
+                >
+                <div class="error-tooltip" id="stateError"
+                  ><span class="error-icon">!</span>Please select a state.</div
+                >
+              </div>
+            </div>
+          </div>
+
+          <div class="checkbox-container">
+            <label for="useLocation"
+              >Want us to auto-detect your location? Check here</label
+            >
+            <input type="checkbox" id="useLocation" name="useLocation" />
+          </div>
+
+          <div class="buttons">
+            <button type="button" id="submitBtn">SUBMIT</button>
+            <button type="button" id="clearBtn">CLEAR</button>
+          </div>
+        </form>
+      </div>
+    </div>
 
     <div id="weatherInfo" style="display: none; margin-top: 20px">
       <div id="weatherCard"></div>
@@ -198,7 +219,7 @@
             marginRight: 40,
             marginTop: 50,
             plotBorderWidth: 1,
-            height: 310,
+            height: 400,
             alignTicks: false,
             scrollablePlotArea: {
               minWidth: 720,
@@ -501,9 +522,6 @@
         hourlyTimeline.intervals.forEach((interval) => {
           const x = Date.parse(interval.startTime)
           const values = interval.values
-
-          console.log(values)
-
           // Populate the parallel arrays
           this.symbols.push(weatherIconMapping[values.weatherCode])
 
@@ -683,7 +701,7 @@
         function sendRequest(data) {
           // Construct query parameters
           const params = new URLSearchParams(data).toString()
-          const url = `http://127.0.0.1:5000/get_weather?${params}`
+          const url = `/get_weather?${params}`
 
           fetch(url)
             .then((response) => response.json())
@@ -742,50 +760,101 @@
           const visibility = dayData.values.visibility
           const sunrise = dayData.values.sunriseTime
           const sunset = dayData.values.sunsetTime
-
+          console.log(`images/symbols/${weatherIcon}.svg`)
           const htmlContent = `
-                <div class="weather-card">
-                  <h2>${formattedDate}</h2>
-                  <div class="weather-info">
-                    <div class="weather-icon-wrapper">
-                      <img src="images/symbols/${weatherIcon}.svg" alt="Weather Icon" class="weather-icon">
-                      <span class="weather-description">${weatherDescription}</span>
+              <div class="daily-weather-container">
+                <h1 class="daily-weather-title"> Daily Weather Details </h1>
+                <div class="weather-detailed">
+                  <div class="weather-detailed-header">
+                    <div class="weather-info">
+                      <h3 class="date">${formattedDate}</h3>
+                      <p class="description">${weatherDescription}</p>
+                      <p class="temperature">${tempHigh}°F / ${tempLow}°F</p>
                     </div>
-                    <span class="temperature">${tempHigh}° / ${tempLow}°</span>
+                    <div class="weather-detailed-icon-wrapper">
+                      <img src="images/symbols/${weatherIcon}.svg" alt="Weather Icon" class="weather-detailed-icon">
+                    </div>
                   </div>
-                  <ul class="weather-details">
-                    <li><strong>Precipitation:</strong> ${precipitation}% ${precipitationType}</li>
-                    <li><strong>Wind:</strong> ${windSpeed} mph</li>
-                    <li><strong>Humidity:</strong> ${humidity}%</li>
-                    <li><strong>Visibility:</strong> ${visibility} mi</li>
-                  </ul>
-                  <div class="sun-times">
-                    <div class="sunrise">
-                      <span>Sunrise: ${new Date(sunrise).toLocaleTimeString(
-                        'en-US',
-                        {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        },
-                      )}</span>
+                  <div class="weather-detailed-info">
+                    <div class="detail-row">
+                      <span class="detail-label">Precipitation:</span>
+                      <span class="detail-value">${precipitation}% ${precipitationType}</span>
                     </div>
-                    <div class="sunset">
-                      <span>Sunset: ${new Date(sunset).toLocaleTimeString(
-                        'en-US',
-                        {
-                          hour: '2-digit',
-                          minute: '2-digit',
-                        },
-                      )}</span>
+                    <div class="detail-row">
+                      <span class="detail-label">Wind Speed:</span>
+                      <span class="detail-value">${windSpeed} mph</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Humidity:</span>
+                      <span class="detail-value">${humidity}%</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Visibility:</span>
+                      <span class="detail-value">${visibility} mi</span>
+                    </div>
+                    <div class="detail-row">
+                      <span class="detail-label">Sunrise/Sunset:</span>
+                      <span class="detail-value">${new Date(sunrise)
+                        .toLocaleTimeString('en-US', {
+                          hour: 'numeric',
+                          hour12: true,
+                        })
+                        .replace(':00', '')}/${new Date(sunset)
+            .toLocaleTimeString('en-US', {
+              hour: 'numeric',
+              hour12: true,
+            })
+            .replace(':00', '')}</span>
                     </div>
                   </div>
                 </div>
 
-                <div id="dailyTempChart" style="width: 100%; height: 300px; margin-top: 20px;"></div>
+                
 
-                <div id="meteogramContainer" style="width: 100%; height: 400px; margin-top: 20px;"></div>
+                <h1 class="daily-weather-title"> Weather Charts </h1>
+
+                <div class="toggle-button-container" id = "toggle-button-container">
+                  <img src="images/point-down-512.png" alt="Show Charts" id="toggle-charts-down" class="toggle-button visible">
+                  <img src="images/point-up-512.png" alt="Hide Charts" id="toggle-charts-up" class="toggle-button hidden">
+                </div>
+
+                <div id="charts-container" style="display: none; width: 100%; height: 95vh;">
+                  <div id="dailyTempChart" style="width: 100%; height: 400px; margin-top: 20px;"></div>
+                  <div id="meteogramContainer" style="width: 100%; height: 400px; margin-top: 20px;"></div>
+                </div>
+              </div>
                 `
           weatherCardDiv.innerHTML = htmlContent
+
+          const toggleDownButton = document.getElementById('toggle-charts-down')
+          const toggleUpButton = document.getElementById('toggle-charts-up')
+          const chartsContainer = document.getElementById('charts-container')
+
+          function showCharts() {
+            chartsContainer.style.display = 'block'
+            toggleDownButton.classList.remove('visible')
+            toggleDownButton.classList.add('hidden')
+            toggleUpButton.classList.remove('hidden')
+            toggleUpButton.classList.add('visible')
+
+            const toggleButtonContainer = document.getElementById(
+              'toggle-button-container',
+            )
+            toggleButtonContainer.scrollIntoView({block: 'start'})
+          }
+
+          function hideCharts() {
+            chartsContainer.style.display = 'none'
+            toggleUpButton.classList.remove('visible')
+            toggleUpButton.classList.add('hidden')
+            toggleDownButton.classList.remove('hidden')
+            toggleDownButton.classList.add('visible')
+          }
+
+          toggleDownButton.addEventListener('click', showCharts)
+
+          toggleUpButton.addEventListener('click', hideCharts)
+
           const dailyData = currentData.timelines.find(
             (timeline) => timeline.timestep === '1d',
           )
@@ -850,12 +919,20 @@
                 color: {
                   linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
                   stops: [
-                    [0, '#FF5733'], // High temperature color
-                    [1, '#33C1FF'], // Low temperature color
+                    [0, ' #ef9f34'], // High temperature color
+                    [1, '#79aef8'], // Low temperature color (Dark Blue)
                   ],
                 },
                 fillOpacity: 0.3,
                 lineWidth: 1,
+                marker: {
+                  enabled: true,
+                  fillColor: '#79aef8',
+                  lineColor: '#79aef8',
+                  lineWidth: 1,
+                  symbol: 'circle',
+                  radius: 4,
+                },
               },
             ],
             credits: {
@@ -897,12 +974,12 @@
           let htmlContent = `
               <div class="weather-card">
                 <h2>${address}</h2>
-                <div class="weather-info">
+                <div class="single-weather-info">
                   <div class="weather-icon-wrapper">
                     <img src="images/symbols/${weather_icon}.svg" alt="Weather Icon" class="weather-icon">
-                    <span>${weatherDescription}</span>
+                    <span class="weather-description">${weatherDescription}</span>
                   </div>
-                  <span class="temperature">${temperature} °</span>
+                  <span class="single-temperature">${temperature} °</span>
                 </div>
                 <div class="weather-details">
                   <div class="weather-detail">
