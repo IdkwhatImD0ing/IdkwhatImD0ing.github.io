@@ -142,6 +142,7 @@
                 const loc = dataLocation.loc.split(',')
                 data.latitude = loc[0]
                 data.longitude = loc[1]
+                console.log(data)
                 sendRequest(data)
               })
               .catch((error) => {
@@ -167,9 +168,11 @@
               return
             }
 
-            data.street = streetInput.value.trim()
-            data.city = cityInput.value.trim()
-            data.state = stateInput.value.trim()
+            data = getLocation(
+              streetInput.value.trim(),
+              cityInput.value.trim(),
+              stateInput.value.trim(),
+            )
             sendRequest(data)
           }
         })
@@ -192,11 +195,40 @@
           stateError.style.display = 'none'
         }
 
+        // Function to call google maps geocoding API to get latitude and longitude from address
+        function getLocation(street, city, state) {
+          const address = street + ', ' + city + ', ' + state
+          console.log(address)
+          const apiKey = 'AIzaSyCS67CPJ94dkpqRNee716ZjWANf3qCu70w'
+          const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+            address,
+          )}&key=${apiKey}`
+
+          fetch(url)
+            .then((response) => response.json())
+            .then((data) => {
+              if (data.status === 'OK' && data.results.length > 0) {
+                const location = data.results[0].geometry.location
+                res = {}
+                res.latitude = location.lat
+                res.longitude = location.lng
+                return res
+              } else {
+                alert('Failed to fetch location information from Google Maps.')
+              }
+            })
+            .catch((error) => {
+              alert('An error occurred while fetching location information.')
+              console.error(error)
+              return null
+            })
+        }
+
         // Function to send request to Flask backend
         function sendRequest(data) {
           // Construct query parameters
           const params = new URLSearchParams(data).toString()
-          const url = `/get_weather?${params}`
+          const url = `http://127.0.0.1:5000/get_weather?${params}`
 
           fetch(url)
             .then((response) => response.json())
@@ -204,6 +236,7 @@
               if (dataResponse.error) {
                 alert(dataResponse.error)
               } else {
+                console.log(dataResponse)
                 displayWeather(dataResponse)
               }
             })
