@@ -28,3 +28,140 @@ select {
   padding: 10px 15px;
   margin-right: 10px;
 }
+
+/* Weather Stuff */
+.weather-card {
+  background-color: #f7f7f7;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  max-width: 550px;
+  margin: auto;
+  font-family: 'Arial', sans-serif;
+}
+
+.weather-card h2 {
+  font-size: 18px;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.weather-info {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.temperature {
+  font-size: 96px;
+  font-weight: bold;
+  color: #333;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.weather-icon-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.weather-card .weather-icon {
+  width: 50px;
+  vertical-align: middle;
+}
+
+.weather-card .weather-description {
+  font-size: 18px;
+  color: #888;
+  display: inline-block;
+  margin-left: 10px;
+}
+
+.weather-details {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  flex-wrap: nowrap;
+  gap: 20px;
+}
+
+.weather-detail {
+  text-align: center;
+  white-space: nowrap;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.weather-detail img {
+  width: 30px;
+  height: 30px;
+}
+
+.weather-detail p {
+  color: #555;
+  font-size: 14px;
+}
+
+.detail-title {
+  font-weight: bold;
+}
+
+.detail-value {
+  color: #333;
+  font-size: 16px;
+}
+
+/* Table Stuff*/
+#weatherTable {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+  margin-top: 20px;
+  font-family: 'Arial', sans-serif;
+  border: none;
+  display: none;
+}
+
+#weatherTable thead {
+  background-color: #5f6caf;
+  color: white;
+}
+
+#weatherTable th {
+  padding: 15px;
+  text-align: center;
+  border: none;
+  color: black;
+}
+
+#weatherTable td {
+  padding: 15px;
+  text-align: center;
+}
+
+#weatherTable tbody tr {
+  background-color: white;
+  border: none;
+  border-radius: 8px;
+}
+
+.table-weather-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.weather-icon {
+  width: 25px;
+  height: 25px;
+  margin-right: 10px;
+}
+
+#weatherTable tbody td {
+  border: none;
+  background-color: white;
+}

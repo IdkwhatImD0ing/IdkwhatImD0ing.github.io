@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <title>Weather Search</title>
     <link rel="stylesheet" href="hw2.css" />
+    <script src="https://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/highcharts-more.js"></script>
+    <script src="https://code.highcharts.com/modules/arearange.js"></script>
+    <script src="https://code.highcharts.com/modules/windbarb.js"></script>
   </head>
   <body>
     <h1>Weather Search</h1>
@@ -90,12 +94,445 @@
       </div>
     </form>
 
-    <div class="result" id="resultArea" style="display: none">
-      <h2>Weather Information:</h2>
-      <div id="weatherInfo"></div>
+    <div id="weatherInfo" style="display: none; margin-top: 20px">
+      <div id="weatherCard"></div>
+      <table id="weatherTable" border="1">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Temp High</th>
+            <th>Temp Low</th>
+            <th>Wind Speed</th>
+          </tr>
+        </thead>
+        <tbody id="weatherTableBody"></tbody>
+      </table>
     </div>
 
     <script>
+      const weatherIconMapping = {
+        1000: 'clear_day',
+        1100: 'mostly_clear_day',
+        1101: 'partly_cloudy_day',
+        1102: 'mostly_cloudy',
+        1001: 'cloudy',
+        2000: 'fog',
+        2100: 'fog_light',
+        4000: 'drizzle',
+        4001: 'rain',
+        4200: 'rain_light',
+        4201: 'rain_heavy',
+        5000: 'snow',
+        5001: 'flurries',
+        5100: 'snow_light',
+        5101: 'snow_heavy',
+        6000: 'freezing_drizzle',
+        6001: 'freezing_rain',
+        6200: 'freezing_rain_light',
+        6201: 'freezing_rain_heavy',
+        7000: 'ice_pellets',
+        7101: 'ice_pellets_heavy',
+        7102: 'ice_pellets_light',
+        8000: 'tstorm',
+      }
+      // Define weather code descriptions
+      const weatherCodeDescriptions = {
+        0: 'Unknown',
+        1000: 'Clear',
+        1100: 'Mostly Clear',
+        1101: 'Partly Cloudy',
+        1102: 'Mostly Cloudy',
+        1001: 'Cloudy',
+        2000: 'Fog',
+        2100: 'Light Fog',
+        4000: 'Drizzle',
+        4001: 'Rain',
+        4200: 'Light Rain',
+        4201: 'Heavy Rain',
+        5000: 'Snow',
+        5001: 'Flurries',
+        5100: 'Light Snow',
+        5101: 'Heavy Snow',
+        6000: 'Freezing Drizzle',
+        6001: 'Freezing Rain',
+        6200: 'Light Freezing Rain',
+        6201: 'Heavy Freezing Rain',
+        7000: 'Ice Pellets',
+        7101: 'Heavy Ice Pellets',
+        7102: 'Light Ice Pellets',
+        8000: 'Thunderstorm',
+      }
+
+      const precipitationTypes = {
+        0: 'N/A',
+        1: 'Rain',
+        2: 'Snow',
+        3: 'Freezing Rain',
+        4: 'Ice Pellets',
+      }
+
+      /* Copied from highcharts meteogram example */
+      function Meteogram(data, container) {
+        // Parallel arrays for the chart data, these are populated as the JSON file
+        // is loaded
+        this.symbols = []
+        this.humidities = []
+        this.winds = []
+        this.temperatures = []
+        this.pressures = []
+
+        // Initialize
+        this.data = data
+        this.container = container
+
+        // Run
+        this.parseData()
+      }
+
+      Meteogram.prototype.getChartOptions = function () {
+        return {
+          chart: {
+            renderTo: this.container,
+            marginBottom: 70,
+            marginRight: 40,
+            marginTop: 50,
+            plotBorderWidth: 1,
+            height: 310,
+            alignTicks: false,
+            scrollablePlotArea: {
+              minWidth: 720,
+            },
+          },
+          title: {
+            text: 'Hourly Weather (For Next 5 Days)',
+            align: 'center',
+          },
+          credits: {
+            text: 'Forecast',
+            position: {
+              x: -40,
+            },
+          },
+          tooltip: {
+            shared: true,
+            useHTML: true,
+            headerFormat: '<small>{point.x:%A, %b %e, %H:%M}</small><br/>',
+            pointFormat:
+              '<b>{series.name}</b>: {point.y}{series.tooltipOptions.valueSuffix}<br/>',
+          },
+          xAxis: [
+            {
+              type: 'datetime',
+              tickInterval: 8 * 36e5, // two hours
+              minorTickInterval: 36e5, // one hour
+              tickLength: 0,
+              gridLineWidth: 1,
+              gridLineColor: 'rgba(128, 128, 128, 0.1)',
+              startOnTick: false,
+              endOnTick: false,
+              minPadding: 0,
+              maxPadding: 0,
+              offset: 30,
+              showLastLabel: true,
+              labels: {
+                format: '{value:%H}',
+              },
+              crosshair: true,
+            },
+            {
+              linkedTo: 0,
+              type: 'datetime',
+              tickInterval: 24 * 3600 * 1000,
+              labels: {
+                format:
+                  '<span style="font-size: 12px; font-weight: bold;">{value:%a}</span>, {value:%b} {value:%d}',
+                align: 'left',
+                x: 3,
+                y: 8,
+              },
+              opposite: true,
+              tickLength: 20,
+              gridLineWidth: 1,
+            },
+          ],
+          yAxis: [
+            {
+              title: {
+                text: '',
+              },
+              labels: {
+                format: '{value}°',
+                style: {
+                  fontSize: '10px',
+                },
+                x: -3,
+              },
+              plotLines: [
+                {
+                  value: 0,
+                  color: '#BBBBBB',
+                  width: 1,
+                  zIndex: 2,
+                },
+              ],
+              maxPadding: 0.3,
+              minRange: 8,
+              tickInterval: 1,
+              gridLineColor: 'rgba(128, 128, 128, 0.1)',
+            },
+            {
+              title: {
+                text: '',
+              },
+              labels: {
+                format: '{value} mm',
+                style: {
+                  fontSize: '10px',
+                },
+              },
+              min: 0,
+              gridLineWidth: 0,
+              opposite: false,
+            },
+            {
+              title: {
+                text: 'inHg',
+                offset: 0,
+                align: 'high',
+                rotation: 0,
+                style: {
+                  fontSize: '10px',
+                  color: 'orange',
+                },
+                textAlign: 'left',
+              },
+              labels: {
+                style: {
+                  fontSize: '8px',
+                  color: 'orange',
+                  fontWeight: 'bold',
+                },
+                y: 2,
+                x: 3,
+              },
+              gridLineWidth: 0,
+              opposite: true,
+              showLastLabel: true,
+            },
+          ],
+          legend: {
+            enabled: false,
+          },
+          plotOptions: {
+            series: {
+              pointPlacement: 'between',
+            },
+          },
+          series: [
+            {
+              name: 'Temperature',
+              data: this.temperatures,
+              type: 'spline',
+              marker: {
+                enabled: false,
+                states: {
+                  hover: {
+                    enabled: true,
+                  },
+                },
+              },
+
+              zIndex: 1,
+              color: '#FF3333',
+              negativeColor: '#48AFE8',
+              tooltip: {
+                pointFormat:
+                  '<span style="color:{point.color}">\u25CF</span>' +
+                  ' ' +
+                  '{series.name}: <b>{point.y} °F</b><br/>',
+              },
+            },
+            {
+              name: 'Humidity',
+              color: '#48AFE8',
+              data: this.humidities,
+              type: 'column',
+              dataLabels: {
+                enabled: true,
+                formatter: function () {
+                  if (this.point.index % 2 === 0) {
+                    return `${Math.round(this.y)}`
+                  } else {
+                    return null
+                  }
+                },
+                style: {
+                  fontSize: '10px',
+                  color: 'darkgrey', // Dark grey text
+                  textShadow: '1px 1px 2px black', // Black border effect
+                  fontWeight: 'normal', // Ensure text is not bold
+                },
+              },
+              tooltip: {
+                pointFormat:
+                  '<span style="color:{point.color}">\u25CF</span>' +
+                  ' ' +
+                  '{series.name}: <b>{point.y} %</b><br/>',
+              },
+            },
+            {
+              name: 'Air Pressure',
+              color: 'orange',
+              data: this.pressures,
+              type: 'spline',
+              marker: {
+                enabled: false,
+              },
+              dashStyle: 'shortdot',
+              yAxis: 2,
+              tooltip: {
+                pointFormat:
+                  '<span style="color:{point.color}">\u25CF</span>' +
+                  ' ' +
+                  '{series.name}: <b>{point.y} inHg</b><br/>',
+              },
+            },
+            {
+              name: 'Wind',
+              type: 'windbarb',
+              id: 'windbarbs',
+              color: Highcharts.getOptions().colors[1],
+              lineWidth: 1.5,
+              data: this.winds,
+              vectorLength: 18,
+              yOffset: -15,
+              tooltip: {
+                pointFormat:
+                  '<span style="color:{point.color}">\u25CF</span>' +
+                  ' ' +
+                  '{series.name}: <b>{point.value} mph</b><br/>',
+              },
+            },
+          ],
+        }
+      }
+
+      /**
+       * Post-process the chart from the callback function, the second argument
+       * Highcharts.Chart.
+       */
+      Meteogram.prototype.onChartLoad = function (chart) {
+        this.drawBlocksForWindArrows(chart)
+      }
+
+      /**
+       * Draw blocks around wind arrows, below the plot area
+       */
+      Meteogram.prototype.drawBlocksForWindArrows = function (chart) {
+        const xAxis = chart.xAxis[0]
+
+        for (
+          let pos = xAxis.min, max = xAxis.max, i = 0;
+          pos <= max + 36e5;
+          pos += 36e5, i += 1
+        ) {
+          // Get the X position
+          const isLast = pos === max + 36e5,
+            x = Math.round(xAxis.toPixels(pos)) + (isLast ? 0.5 : -0.5)
+
+          // Draw the vertical dividers and ticks
+          const isLong =
+            this.resolution > 36e5 ? pos % this.resolution === 0 : i % 2 === 0
+
+          chart.renderer
+            .path([
+              'M',
+              x,
+              chart.plotTop + chart.plotHeight + (isLong ? 0 : 28),
+              'L',
+              x,
+              chart.plotTop + chart.plotHeight + 32,
+              'Z',
+            ])
+            .attr({
+              stroke: chart.options.chart.plotBorderColor,
+              'stroke-width': 1,
+            })
+            .add()
+        }
+
+        // Center items in block
+        chart.get('windbarbs').markerGroup.attr({
+          translateX: chart.get('windbarbs').markerGroup.translateX + 8,
+        })
+      }
+
+      /**
+       * Create the chart. This function is called async when the data file is loaded
+       * and parsed.
+       */
+      Meteogram.prototype.createChart = function () {
+        this.chart = new Highcharts.Chart(this.getChartOptions(), (chart) => {
+          this.onChartLoad(chart)
+        })
+      }
+
+      Meteogram.prototype.error = function () {
+        document.getElementById('loading').innerHTML =
+          '<i class="fa fa-frown-o"></i> Failed loading data, please try again ' +
+          'later'
+      }
+
+      Meteogram.prototype.parseData = function () {
+        if (!this.data || !this.data.timelines) {
+          return this.error()
+        }
+
+        // Getting the hourly timeline
+        const hourlyTimeline = this.data.timelines.find(
+          (timeline) => timeline.timestep === '1h',
+        )
+
+        if (!hourlyTimeline) {
+          return this.error()
+        }
+
+        hourlyTimeline.intervals.forEach((interval) => {
+          const x = Date.parse(interval.startTime)
+          const values = interval.values
+
+          console.log(values)
+
+          // Populate the parallel arrays
+          this.symbols.push(weatherIconMapping[values.weatherCode])
+
+          this.temperatures.push({
+            x: x,
+            y: values.temperature,
+          })
+
+          this.humidities.push({
+            x: x,
+            y: values.humidity,
+          })
+
+          this.pressures.push({
+            x: x,
+            y: values.pressureSeaLevel,
+          })
+
+          this.winds.push({
+            x: x,
+            value: values.windSpeed,
+            direction: values.windDirection,
+          })
+        })
+
+        // Create the chart after parsing data
+        this.createChart()
+      }
+
       document.addEventListener('DOMContentLoaded', function () {
         const useLocationCheckbox = document.getElementById('useLocation')
         const streetInput = document.getElementById('street')
@@ -103,8 +540,13 @@
         const stateInput = document.getElementById('state')
         const submitBtn = document.getElementById('submitBtn')
         const clearBtn = document.getElementById('clearBtn')
-        const resultArea = document.getElementById('resultArea')
         const weatherInfo = document.getElementById('weatherInfo')
+        const weatherCardDiv = document.getElementById('weatherCard')
+        const weatherTable = document.getElementById('weatherTable')
+        const weatherTableBody = document.getElementById('weatherTableBody')
+        let latitude = null
+        let longitude = null
+        let currentData = null
 
         // Error elements
         const streetError = document.getElementById('streetError')
@@ -139,9 +581,18 @@
             fetch('https://ipinfo.io/json?token=aace562e162468  ')
               .then((response) => response.json())
               .then((dataLocation) => {
+                console.log(dataLocation)
                 const loc = dataLocation.loc.split(',')
                 data.latitude = loc[0]
                 data.longitude = loc[1]
+                latitude = loc[0]
+                longitude = loc[1]
+                data.address =
+                  dataLocation.city +
+                  ', ' +
+                  dataLocation.region +
+                  ', ' +
+                  dataLocation.country
                 console.log(data)
                 sendRequest(data)
               })
@@ -168,24 +619,57 @@
               return
             }
 
-            data = getLocation(
-              streetInput.value.trim(),
-              cityInput.value.trim(),
-              stateInput.value.trim(),
-            )
-            sendRequest(data)
+            const address =
+              streetInput.value.trim() +
+              ', ' +
+              cityInput.value.trim() +
+              ', ' +
+              stateInput.value.trim()
+
+            const apiKey = 'AIzaSyCS67CPJ94dkpqRNee716ZjWANf3qCu70w'
+            const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
+              address,
+            )}&key=${apiKey}`
+
+            fetch(url)
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.status === 'OK' && data.results.length > 0) {
+                  const location = data.results[0].geometry.location
+                  const res = {}
+                  res.latitude = location.lat
+                  res.longitude = location.lng
+                  latitude = location.lat
+                  longitude = location.lng
+                  res.address = data.results[0].formatted_address
+                  sendRequest(res)
+                } else {
+                  alert(
+                    'Failed to fetch location information from Google Maps.',
+                  )
+                }
+              })
+              .catch((error) => {
+                alert('An error occurred while fetching location information.')
+                console.error(error)
+                return null
+              })
           }
         })
 
         // Clear button handler
         clearBtn.addEventListener('click', function () {
           document.getElementById('weatherForm').reset()
+          latitude = null
+          longitude = null
           streetInput.disabled = false
           cityInput.disabled = false
           stateInput.disabled = false
           hideAllErrors()
-          resultArea.style.display = 'none'
-          weatherInfo.innerHTML = ''
+
+          weatherCardDiv.innerHTML = ''
+          weatherInfo.style.display = 'none'
+          weatherTable.style.display = 'none'
         })
 
         // Function to hide all error messages
@@ -193,35 +677,6 @@
           streetError.style.display = 'none'
           cityError.style.display = 'none'
           stateError.style.display = 'none'
-        }
-
-        // Function to call google maps geocoding API to get latitude and longitude from address
-        function getLocation(street, city, state) {
-          const address = street + ', ' + city + ', ' + state
-          console.log(address)
-          const apiKey = 'AIzaSyCS67CPJ94dkpqRNee716ZjWANf3qCu70w'
-          const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(
-            address,
-          )}&key=${apiKey}`
-
-          fetch(url)
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.status === 'OK' && data.results.length > 0) {
-                const location = data.results[0].geometry.location
-                res = {}
-                res.latitude = location.lat
-                res.longitude = location.lng
-                return res
-              } else {
-                alert('Failed to fetch location information from Google Maps.')
-              }
-            })
-            .catch((error) => {
-              alert('An error occurred while fetching location information.')
-              console.error(error)
-              return null
-            })
         }
 
         // Function to send request to Flask backend
@@ -237,7 +692,8 @@
                 alert(dataResponse.error)
               } else {
                 console.log(dataResponse)
-                displayWeather(dataResponse)
+                currentData = dataResponse
+                displayWeather(dataResponse, data.address)
               }
             })
             .catch((error) => {
@@ -246,13 +702,295 @@
             })
         }
 
+        function fetchDayWeather(date) {
+          console.log(date)
+          console.log(currentData)
+
+          // Clear the weather table
+          weatherTable.style.display = 'none'
+
+          const dayData = currentData.timelines
+            .find((timeline) => timeline.timestep === '1d')
+            .intervals.find((interval) => {
+              const intervalDate = new Date(interval.startTime)
+              return intervalDate.getDay() === new Date(date).getDay()
+            })
+          const hourlyData = currentData.timelines.find(
+            (timeline) => timeline.timestep === '1h',
+          )
+          const formattedDate = new Date(dayData.startTime).toLocaleDateString(
+            'en-US',
+            {
+              weekday: 'long',
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            },
+          )
+          console.log(dayData)
+          const weatherCode = dayData.values.weatherCode
+          const weatherDescription =
+            weatherCodeDescriptions[weatherCode] || 'Unknown'
+          const weatherIcon = weatherIconMapping[weatherCode] || 'unknown'
+          const tempHigh = dayData.values.temperatureMax
+          const tempLow = dayData.values.temperatureMin
+          const precipitation = dayData.values.precipitationProbability
+          const precipitationType =
+            precipitationTypes[dayData.values.precipitationType]
+          const windSpeed = dayData.values.windSpeed
+          const humidity = dayData.values.humidity
+          const visibility = dayData.values.visibility
+          const sunrise = dayData.values.sunriseTime
+          const sunset = dayData.values.sunsetTime
+
+          const htmlContent = `
+                <div class="weather-card">
+                  <h2>${formattedDate}</h2>
+                  <div class="weather-info">
+                    <div class="weather-icon-wrapper">
+                      <img src="images/symbols/${weatherIcon}.svg" alt="Weather Icon" class="weather-icon">
+                      <span class="weather-description">${weatherDescription}</span>
+                    </div>
+                    <span class="temperature">${tempHigh}° / ${tempLow}°</span>
+                  </div>
+                  <ul class="weather-details">
+                    <li><strong>Precipitation:</strong> ${precipitation}% ${precipitationType}</li>
+                    <li><strong>Wind:</strong> ${windSpeed} mph</li>
+                    <li><strong>Humidity:</strong> ${humidity}%</li>
+                    <li><strong>Visibility:</strong> ${visibility} mi</li>
+                  </ul>
+                  <div class="sun-times">
+                    <div class="sunrise">
+                      <span>Sunrise: ${new Date(sunrise).toLocaleTimeString(
+                        'en-US',
+                        {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        },
+                      )}</span>
+                    </div>
+                    <div class="sunset">
+                      <span>Sunset: ${new Date(sunset).toLocaleTimeString(
+                        'en-US',
+                        {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                        },
+                      )}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div id="dailyTempChart" style="width: 100%; height: 300px; margin-top: 20px;"></div>
+
+                <div id="meteogramContainer" style="width: 100%; height: 400px; margin-top: 20px;"></div>
+                `
+          weatherCardDiv.innerHTML = htmlContent
+          const dailyData = currentData.timelines.find(
+            (timeline) => timeline.timestep === '1d',
+          )
+          console.log(dailyData)
+          const temperatureData = dailyData.intervals.map((interval) => {
+            const time = new Date(interval.startTime).getTime()
+            const tempMin = interval.values.temperatureMin
+            const tempMax = interval.values.temperatureMax
+            return [time, tempMin, tempMax]
+          })
+
+          console.log(temperatureData)
+
+          Highcharts.chart('dailyTempChart', {
+            chart: {
+              type: 'arearange',
+              zoomType: 'x',
+              scrollablePlotArea: {
+                minWidth: 600,
+                scrollPositionX: 1,
+              },
+            },
+            title: {
+              text: 'Temperature Ranges (Min, Max)',
+              align: 'center',
+            },
+            credits: {
+              text: 'Highcharts.com',
+              href: 'https://www.highcharts.com',
+              position: {
+                x: -40,
+              },
+            },
+
+            xAxis: {
+              type: 'datetime',
+              title: {
+                text: '',
+              },
+              accessibility: {
+                rangeDescription: 'Time range of the selected day.',
+              },
+            },
+            yAxis: {
+              title: {
+                text: '',
+              },
+            },
+            tooltip: {
+              crosshairs: true,
+              shared: true,
+              valueSuffix: '°',
+              xDateFormat: '%H:%M',
+            },
+            legend: {
+              enabled: false,
+            },
+            series: [
+              {
+                name: 'Temperature Range',
+                data: temperatureData,
+                color: {
+                  linearGradient: {x1: 0, x2: 0, y1: 0, y2: 1},
+                  stops: [
+                    [0, '#FF5733'], // High temperature color
+                    [1, '#33C1FF'], // Low temperature color
+                  ],
+                },
+                fillOpacity: 0.3,
+                lineWidth: 1,
+              },
+            ],
+            credits: {
+              enabled: false,
+            },
+          })
+          const meteogram = new Meteogram(currentData, 'meteogramContainer')
+        }
+
         // Function to display weather information
-        function displayWeather(data) {
-          let htmlContent = `<p><strong>Location:</strong> ${data.location}</p>`
-          htmlContent += `<p><strong>Temperature:</strong> ${data.temperature} °C</p>`
-          htmlContent += `<p><strong>Weather:</strong> ${data.weather}</p>`
-          weatherInfo.innerHTML = htmlContent
-          resultArea.style.display = 'block'
+        function displayWeather(data, address) {
+          // Extract the '1h' timeline
+          const hourlyTimeline = data.timelines.find(
+            (timeline) => timeline.timestep === '1h',
+          )
+
+          // Get the current hour's data (first interval)
+          const currentWeather = hourlyTimeline.intervals[0].values
+
+          //
+
+          // Extract required fields
+          const temperature = currentWeather.temperature
+          const weatherCode = currentWeather.weatherCode
+          const weatherDescription =
+            weatherCodeDescriptions[weatherCode] || 'Unknown'
+          const weather_icon = weatherIconMapping[weatherCode] || 'unknown'
+          const humidity = currentWeather.humidity
+          const pressure = currentWeather.pressureSeaLevel
+          const windSpeed = currentWeather.windSpeed
+          const visibility = currentWeather.visibility
+          const cloudCover = currentWeather.cloudCover
+          const uvIndex =
+            currentWeather.uvIndex !== undefined
+              ? currentWeather.uvIndex
+              : 'N/A' // Handle missing uvIndex
+
+          // Create the HTML content for the weather card
+          let htmlContent = `
+              <div class="weather-card">
+                <h2>${address}</h2>
+                <div class="weather-info">
+                  <div class="weather-icon-wrapper">
+                    <img src="images/symbols/${weather_icon}.svg" alt="Weather Icon" class="weather-icon">
+                    <span>${weatherDescription}</span>
+                  </div>
+                  <span class="temperature">${temperature} °</span>
+                </div>
+                <div class="weather-details">
+                  <div class="weather-detail">
+                    <p class="detail-title">Humidity</p>
+                    <img src="images/humidity.png"class="detail-icon">
+                    <p class="detail-value">${humidity}%</p>
+                  </div>
+                  <div class="weather-detail">
+                    <p class="detail-title">Pressure</p>
+                    <img src="images/Pressure.png" class="detail-icon">
+                    <p class="detail-value">${pressure} inHg</p>
+                  </div>
+                  <div class="weather-detail">
+                    <p class="detail-title">Wind Speed</p>
+                    <img src="images/Wind_Speed.png" class="detail-icon">
+                    <p class="detail-value">${windSpeed} mph</p>
+                  </div>
+                  <div class="weather-detail">
+                    <p class="detail-title">Visibility</p>
+                    <img src="images/Visibility.png" class="detail-icon">
+                    <p class="detail-value">${visibility} miles</p>
+                  </div>
+                  <div class="weather-detail">
+                    <p class="detail-title">Cloud Cover</p>
+                    <img src="images/Cloud_Cover.png" class="detail-icon">
+                    <p class="detail-value">${cloudCover}%</p>
+                  </div>
+                  <div class="weather-detail">
+                    <p class="detail-title">UV Index</p>
+                    <img src="images/UV_Level.png" class="detail-icon">
+                    <p class="detail-value">${uvIndex}</p>
+                  </div>
+                </div>
+              </div>
+            `
+          // Inject the HTML into the DOM
+          weatherCardDiv.innerHTML = htmlContent
+
+          const dailyTimeline = data.timelines.find(
+            (timeline) => timeline.timestep === '1d',
+          )
+
+          dailyTimeline.intervals.forEach((interval) => {
+            const formattedDate = new Date(
+              interval.startTime,
+            ).toLocaleDateString('en-US', {
+              weekday: 'long',
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+            })
+            const weatherCode = interval.values.weatherCode
+            const weatherDescription =
+              weatherCodeDescriptions[weatherCode] || 'Unknown'
+            const weatherIcon = weatherIconMapping[weatherCode] || 'unknown'
+            const tempHigh = interval.values.temperatureMax
+            const tempLow = interval.values.temperatureMin
+            const windSpeed = interval.values.windSpeed
+
+            const row = weatherTableBody.insertRow()
+            const dateCell = row.insertCell(0)
+            const statusCell = row.insertCell(1)
+            const tempHighCell = row.insertCell(2)
+            const tempLowCell = row.insertCell(3)
+            const windSpeedCell = row.insertCell(4)
+
+            dateCell.textContent = formattedDate
+
+            const weatherInfo = `
+                  <div class="table-weather-info">
+                      <img src="images/symbols/${weatherIcon}.svg" alt="Weather Icon" class="weather-icon">
+                      <span>${weatherDescription}</span>
+                  </div>
+                  `
+
+            statusCell.innerHTML = weatherInfo
+            tempHighCell.textContent = tempHigh
+            tempLowCell.textContent = tempLow
+            windSpeedCell.textContent = windSpeed
+
+            row.addEventListener('click', () => {
+              fetchDayWeather(formattedDate)
+            })
+          })
+
+          // Display the weather information section
+          weatherInfo.style.display = 'block'
+          weatherTable.style.display = 'block'
         }
       })
     </script>
