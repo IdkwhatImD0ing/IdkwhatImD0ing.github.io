@@ -1,0 +1,18 @@
+<div *ngIf="results">
+  <h3>Search Results</h3>
+  <div class="card">
+    <div class="card-body">
+      <p><strong>Street:</strong> {{ results.street }}</p>
+      <p><strong>City:</strong> {{ results.city }}</p>
+      <p><strong>State:</strong> {{ results.state }}</p>
+      <p>
+        <strong>Using Current Location:</strong>
+        {{ results.currentLocation ? "Yes" : "No" }}
+      </p>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!results">
+  <p>No results to display.</p>
+</div>
