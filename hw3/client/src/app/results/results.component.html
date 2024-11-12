@@ -1,18 +1,42 @@
-<div *ngIf="results">
-  <h3>Search Results</h3>
-  <div class="card">
-    <div class="card-body">
-      <p><strong>Street:</strong> {{ results.street }}</p>
-      <p><strong>City:</strong> {{ results.city }}</p>
-      <p><strong>State:</strong> {{ results.state }}</p>
-      <p>
-        <strong>Using Current Location:</strong>
-        {{ results.currentLocation ? "Yes" : "No" }}
-      </p>
-    </div>
-  </div>
-</div>
+<!-- src/app/results/results.component.html -->
+<div *ngIf="searchResult" class="container mt-4">
+  <!-- Title -->
+  <h2>{{ getTitle() }}</h2>
 
-<div *ngIf="!results">
-  <p>No results to display.</p>
+  <!-- Buttons -->
+  <div class="d-flex justify-content-end mb-3">
+    <button
+      type="button"
+      class="btn btn-outline-primary me-2"
+      (click)="onFavorite()"
+    >
+      Favorite
+    </button>
+    <button
+      type="button"
+      class="btn btn-outline-secondary"
+      (click)="onDetails()"
+    >
+      Details
+    </button>
+  </div>
+
+  <!-- Tabs -->
+  <div class="mb-3">
+    <mat-tab-group>
+      <mat-tab label="Day View">
+        <app-day-view [weatherData]="searchResult?.weatherData"></app-day-view>
+      </mat-tab>
+      <mat-tab label="Daily Temp Chart">
+        <app-daily-temp-chart
+          [weatherData]="searchResult?.weatherData"
+        ></app-daily-temp-chart>
+      </mat-tab>
+      <mat-tab label="Meterogram">
+        <app-meteogram
+          [weatherData]="searchResult?.weatherData"
+        ></app-meteogram>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
 </div>

@@ -1,3 +1,16 @@
-.card {
-  margin-top: 20px;
+/* src/app/results/results.component.css */
+
+/* Ensure Angular Material form fields and tabs take full width */
+.mat-tab-group {
+  width: 100%;
+}
+
+/* Optional: Add some spacing around the buttons */
+.d-flex {
+  align-items: center;
+}
+
+/* Optional: Customize the tab appearance if needed */
+.mat-tab-label {
+  font-weight: bold;
 }

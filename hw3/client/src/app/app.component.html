@@ -1,1 +1,10 @@
-<app-search-form></app-search-form>
+<!-- src/app/app.component.html -->
+<div class="container">
+  <!-- Search Form Component -->
+  <app-search-form
+    (searchCompleted)="onSearchCompleted($event)"
+  ></app-search-form>
+
+  <!-- Results Component -->
+  <app-results *ngIf="searchResult" [searchResult]="searchResult"></app-results>
+</div>

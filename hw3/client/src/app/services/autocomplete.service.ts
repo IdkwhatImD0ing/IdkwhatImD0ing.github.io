@@ -17,11 +17,6 @@ export class AutocompleteService {
 
   constructor(private http: HttpClient) { }
 
-  /**
-   * Fetch city predictions from Google Places Autocomplete API
-   * @param input - The user input for city
-   * @returns Observable of string array containing city names
-   */
   getCityPredictions(input: string): Observable<string[]> {
     if (!input.trim()) {
       return of([]);

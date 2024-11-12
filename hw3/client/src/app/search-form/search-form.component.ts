@@ -1,6 +1,14 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AutocompleteService } from '../services/autocomplete.service';
+
+interface SearchResult {
+  latitude: number;
+  longitude: number;
+  city: string;
+  state: string;
+  weatherData: any;
+}
 
 @Component({
   selector: 'app-search-form',
@@ -8,6 +16,8 @@ import { AutocompleteService } from '../services/autocomplete.service';
   styleUrls: ['./search-form.component.css']
 })
 export class SearchFormComponent implements OnInit {
+  @Output() searchCompleted = new EventEmitter<SearchResult>();
+
   searchForm: FormGroup;
   stateOptions: string[] = [
     'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
@@ -40,25 +50,19 @@ export class SearchFormComponent implements OnInit {
     this.setupCityAutocomplete();
   }
 
-  /**
-   * Custom validator to check for non-whitespace input
-   */
+
   noWhitespaceValidator(control: any) {
     const isWhitespace = (control.value || '').trim().length === 0;
     const isValid = !isWhitespace;
     return isValid ? null : { whitespace: true };
   }
 
-  /**
-   * Handle enabling/disabling form fields based on Current Location checkbox
-   */
   onCurrentLocationChange(): void {
     this.searchForm.get('currentLocation')?.valueChanges.subscribe((checked: boolean) => {
       if (checked) {
         this.searchForm.get('street')?.disable();
         this.searchForm.get('city')?.disable();
         this.searchForm.get('state')?.disable();
-        this.getCurrentLocation();
       } else {
         this.searchForm.get('street')?.enable();
         this.searchForm.get('city')?.enable();
@@ -67,38 +71,47 @@ export class SearchFormComponent implements OnInit {
     });
   }
 
-  /**
-   * Obtain the user's current location
-   */
+
   getCurrentLocation(): void {
-    if (navigator.geolocation) {
-      this.isFetchingLocation = true;
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          console.log('Latitude:', position.coords.latitude);
-          console.log('Longitude:', position.coords.longitude);
-          // Implement reverse geocoding to populate street, city, and state
-          // For example, call a reverse geocoding service with the coordinates
-          // and update the form fields accordingly.
-          // This implementation is left as an exercise.
-          this.isFetchingLocation = false;
-        },
-        (error) => {
-          console.error('Error obtaining location:', error);
-          this.isFetchingLocation = false;
-          // Optionally, uncheck the checkbox or notify the user
-          this.searchForm.get('currentLocation')?.setValue(false);
-        }
-      );
-    } else {
-      console.error('Geolocation is not supported by this browser.');
-      this.searchForm.get('currentLocation')?.setValue(false);
-    }
+    this.isFetchingLocation = true;
+    fetch('https://ipinfo.io/json?token=aace562e162468')
+      .then((response) => response.json())
+      .then((dataLocation) => {
+        console.log('Location data:', dataLocation);
+        const loc = dataLocation.loc.split(',');
+        const latitude = loc[0];
+        const longitude = loc[1];
+        const city = dataLocation.city;
+        const state = dataLocation.region;
+
+        console.log(latitude, longitude, city, state);
+
+
+        fetch(`http://localhost:3000/get_weather?latitude=${latitude}&longitude=${longitude}`)
+          .then(response => response.json())
+          .then(weatherData => {
+            console.log('Weather data:', weatherData);
+            this.emitSearchResult(latitude, longitude, city, state, weatherData);
+          })
+          .catch(error => {
+            console.error('Error fetching weather:', error);
+            alert('Failed to fetch weather information.');
+          });
+
+        this.isFetchingLocation = false;
+      })
+      .catch((error) => {
+        console.error('Error obtaining location:', error);
+        this.isFetchingLocation = false;
+        this.searchForm.get('currentLocation')?.setValue(false);
+        alert('Failed to fetch location information.');
+      });
+
+
+
   }
 
-  /**
-   * Set up the Autocomplete for the City field
-   */
+
   setupCityAutocomplete(): void {
     this.searchForm.get('city')?.valueChanges.subscribe(value => {
       this.autocompleteService.getCityPredictions(value).subscribe(
@@ -113,20 +126,13 @@ export class SearchFormComponent implements OnInit {
     });
   }
 
-  /**
-   * Handle selection of a city from the autocomplete dropdown
-   */
   onCitySelected(selected: string): void {
-    // Optionally, implement logic to determine and set the state based on selected city
-    // This might require additional API calls or a local mapping of cities to states
+
     console.log('Selected city:', selected);
-    // Example placeholder:
-    // this.searchForm.get('state')?.setValue(determinedState);
+
   }
 
-  /**
-   * Check if the Search button should be disabled
-   */
+
   isSearchDisabled(): boolean {
     if (this.searchForm.get('currentLocation')?.value) {
       return this.isFetchingLocation; // Disable if location is being fetched
@@ -134,21 +140,18 @@ export class SearchFormComponent implements OnInit {
     return this.searchForm.invalid;
   }
 
-  /**
-   * Handle the Search button click
-   */
+
   onSearch(): void {
     if (this.searchForm.valid) {
       const formData = this.searchForm.value;
-      // Implement the search logic here
-      console.log('Search Data:', formData);
-      // For example, navigate to the Results tab or fetch data from the backend
+      if (formData.currentLocation) {
+        this.getCurrentLocation();
+      } else {
+        console.log('Search Data:', formData);
+      }
     }
   }
 
-  /**
-   * Handle the Clear button click
-   */
   onClear(): void {
     this.searchForm.reset({
       currentLocation: false,
@@ -158,15 +161,11 @@ export class SearchFormComponent implements OnInit {
     });
     this.filteredCities = [];
     this.isAutocompleteEnabled = true;
-    // Implement logic to switch to the Results tab and clear results
-    // Example:
-    // this.switchToResultsTab();
+
     console.log('Form cleared');
   }
 
-  /**
-   * Get error message for the City field
-   */
+
   getCityErrorMessage(): string {
     const cityControl = this.searchForm.get('city');
     if (cityControl?.hasError('required')) {
@@ -177,4 +176,10 @@ export class SearchFormComponent implements OnInit {
     }
     return '';
   }
+
+  emitSearchResult(latitude: number, longitude: number, city: string, state: string, weatherData: any): void {
+    this.searchCompleted.emit({ latitude, longitude, city, state, weatherData });
+  }
 }
+
+
