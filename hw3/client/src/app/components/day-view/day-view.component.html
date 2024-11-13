@@ -1,3 +1,4 @@
+<!-- src/app/day-view/day-view.component.html -->
 <table class="table table-striped">
   <thead>
     <tr>
@@ -11,15 +12,16 @@
   </thead>
   <tbody>
     <tr
-      *ngFor="let day of dailyForecast; let i = index"
+      *ngFor="let day of dailyForecast"
+      (click)="onRowClick(day)"
       style="cursor: pointer"
     >
-      <td>{{ i + 1 }}</td>
+      <td>{{ day.index }}</td>
       <td>{{ day.formattedDate }}</td>
       <td>
         <div class="d-flex align-items-center">
           <img
-            [src]="'/images/symbols/' + day.weatherIcon + '.svg'"
+            src="/images/symbols/{{ day.weatherIcon }}.svg"
             alt="Weather Icon"
             class="weather-icon me-2"
             width="24"

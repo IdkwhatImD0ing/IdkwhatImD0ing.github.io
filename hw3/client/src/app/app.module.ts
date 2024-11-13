@@ -15,15 +15,20 @@ import { MatTabsModule } from '@angular/material/tabs';
 
 // Forms
 import { ReactiveFormsModule } from '@angular/forms';
-import { SearchFormComponent } from './search-form/search-form.component';
+import { SearchFormComponent } from './components/search-form/search-form.component';
 
 // Results
-import { ResultsComponent } from './results/results.component';
-import { DayViewComponent } from './day-view/day-view.component';
-import { DailyTempChartComponent } from './daily-temp-chart/daily-temp-chart.component';
-import { MeteogramComponent } from './meteogram/meteogram.component';
+import { ResultsComponent } from './components/results/results.component';
+import { DayViewComponent } from './components/day-view/day-view.component';
+import { DailyTempChartComponent } from './components/daily-temp-chart/daily-temp-chart.component';
+import { MeteogramComponent } from './components/meteogram/meteogram.component';
+import { DayDetailComponent } from './components/day-detail/day-detail.component';
+
 // Highcharts
 import { HighchartsChartModule } from 'highcharts-angular';
+
+// Google Maps
+import { GoogleMapsModule } from '@angular/google-maps';
 
 @NgModule({
     declarations: [
@@ -32,7 +37,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
         ResultsComponent,
         DayViewComponent,
         DailyTempChartComponent,
-        MeteogramComponent
+        MeteogramComponent,
+        DayDetailComponent
     ],
     imports: [
         BrowserModule,
@@ -45,7 +51,8 @@ import { HighchartsChartModule } from 'highcharts-angular';
         MatFormFieldModule,
         MatSelectModule,
         MatTabsModule,
-        HighchartsChartModule
+        HighchartsChartModule,
+        GoogleMapsModule
     ],
     providers: [
         provideHttpClient(withFetch()),

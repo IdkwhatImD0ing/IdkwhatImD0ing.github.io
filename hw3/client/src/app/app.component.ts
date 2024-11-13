@@ -1,10 +1,5 @@
 import { Component } from '@angular/core';
-
-interface SearchResult {
-  city: string;
-  state: string;
-  weatherData: any;
-}
+import { SearchResult } from './models';
 
 @Component({
   selector: 'app-root',
@@ -18,8 +13,8 @@ export class AppComponent {
 
 
   onSearchCompleted(result: SearchResult): void {
+    console.log('Search completed:', result);
     this.searchResult = result;
-    console.log(this.searchResult);
   }
 }
 

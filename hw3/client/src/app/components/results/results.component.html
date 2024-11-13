@@ -1,0 +1,65 @@
+<div class="results-container">
+  <!-- Main View -->
+  <div *ngIf="!selectedDay" @slideOutLeft class="main-view">
+    <h2>{{ getTitle() }}</h2>
+    <div class="d-flex justify-content-end mb-3">
+      <button class="btn btn-outline-primary me-2" (click)="onFavorite()">
+        Favorite
+      </button>
+      <button class="btn btn-outline-secondary" (click)="onDetails()">
+        Details
+      </button>
+    </div>
+
+    <div class="tabs-container d-flex justify-content-end mb-3">
+      <button
+        class="btn btn-link tab-button"
+        [class.active]="selectedTab === 'dayView'"
+        (click)="selectTab('dayView')"
+      >
+        Day View
+      </button>
+      <button
+        class="btn btn-link tab-button"
+        [class.active]="selectedTab === 'dailyTempChart'"
+        (click)="selectTab('dailyTempChart')"
+      >
+        Daily Temp Chart
+      </button>
+      <button
+        class="btn btn-link tab-button"
+        [class.active]="selectedTab === 'meteogram'"
+        (click)="selectTab('meteogram')"
+      >
+        Meteogram
+      </button>
+    </div>
+
+    <div class="tab-content"></div>
+    <div *ngIf="selectedTab === 'dayView'">
+      <app-day-view
+        (daySelected)="onDaySelected($event)"
+        [weatherData]="searchResult?.weatherData"
+      >
+      </app-day-view>
+    </div>
+    <div *ngIf="selectedTab === 'dailyTempChart'">
+      <app-daily-temp-chart [weatherData]="searchResult?.weatherData">
+      </app-daily-temp-chart>
+    </div>
+    <div *ngIf="selectedTab === 'meteogram'">
+      <app-meteogram [weatherData]="searchResult?.weatherData"> </app-meteogram>
+    </div>
+  </div>
+
+  <!-- Detail View -->
+  <div *ngIf="selectedDay" class="detail-view">
+    <app-day-detail
+      [dayData]="selectedDay"
+      [searchResult]="searchResult"
+      (goBack)="goBack()"
+      (postToX)="postToX()"
+    >
+    </app-day-detail>
+  </div>
+</div>

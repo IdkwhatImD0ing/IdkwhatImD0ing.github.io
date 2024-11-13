@@ -1,0 +1,69 @@
+<!-- src/app/day-detail/day-detail.component.html -->
+<div class="day-detail">
+  <!-- Header -->
+  <div
+    class="header d-flex justify-content-between align-items-center p-3 bg-light"
+  >
+    <button class="btn btn-link" (click)="handleGoBack()">
+      <i class="fa fa-arrow-left"></i> List
+    </button>
+    <h5>{{ dayData?.formattedDate }}</h5>
+    <button class="btn btn-link" (click)="handlePostToX()">
+      <img src="public/twitter-x.svg" alt="X logo" />
+    </button>
+  </div>
+
+  <!-- Details List -->
+  <div class="details p-3">
+    <ul class="list-group">
+      <li class="list-group-item">
+        <strong>Status:</strong> {{ weatherDetails?.status }}
+      </li>
+      <li class="list-group-item">
+        <strong>Max Temp:</strong> {{ weatherDetails?.tempMax }}°F
+      </li>
+      <li class="list-group-item">
+        <strong>Min Temp:</strong> {{ weatherDetails?.tempMin }}°F
+      </li>
+      <li class="list-group-item">
+        <strong>Apparent Temp:</strong> {{ weatherDetails?.apparentTemp }}°F
+      </li>
+      <li class="list-group-item">
+        <strong>Sun Rise:</strong> {{ weatherDetails?.sunRise }}
+      </li>
+      <li class="list-group-item">
+        <strong>Sun Set:</strong> {{ weatherDetails?.sunSet }}
+      </li>
+      <li class="list-group-item">
+        <strong>Humidity:</strong> {{ weatherDetails?.humidity }}%
+      </li>
+      <li class="list-group-item">
+        <strong>Wind Speed:</strong> {{ weatherDetails?.windSpeed }} mph
+      </li>
+      <li class="list-group-item">
+        <strong>Visibility:</strong> {{ weatherDetails?.visibility }} miles
+      </li>
+      <li class="list-group-item">
+        <strong>Cloud Cover:</strong> {{ weatherDetails?.cloudCover }}%
+      </li>
+    </ul>
+  </div>
+
+  <!-- Google Maps -->
+  <div class="map p-3" *ngIf="weatherDetails">
+    <google-map
+      [center]="{ lat: weatherDetails.latitude, lng: weatherDetails.longitude }"
+      [zoom]="10"
+      height="400px"
+      width="100%"
+    >
+      <map-marker
+        [position]="{
+          lat: weatherDetails.latitude,
+          lng: weatherDetails.longitude
+        }"
+      >
+      </map-marker>
+    </google-map>
+  </div>
+</div>

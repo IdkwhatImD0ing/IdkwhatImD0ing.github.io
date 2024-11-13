@@ -1,14 +1,7 @@
 import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { AutocompleteService } from '../services/autocomplete.service';
-
-interface SearchResult {
-  latitude: number;
-  longitude: number;
-  city: string;
-  state: string;
-  weatherData: any;
-}
+import { AutocompleteService } from '../../services/autocomplete.service';
+import { SearchResult } from '../../models';
 
 @Component({
   selector: 'app-search-form',
@@ -79,18 +72,16 @@ export class SearchFormComponent implements OnInit {
       .then((dataLocation) => {
         console.log('Location data:', dataLocation);
         const loc = dataLocation.loc.split(',');
-        const latitude = loc[0];
-        const longitude = loc[1];
+        const latitude = parseFloat(loc[0]);
+        const longitude = parseFloat(loc[1]);
         const city = dataLocation.city;
         const state = dataLocation.region;
 
-        console.log(latitude, longitude, city, state);
 
 
         fetch(`http://localhost:3000/get_weather?latitude=${latitude}&longitude=${longitude}`)
           .then(response => response.json())
           .then(weatherData => {
-            console.log('Weather data:', weatherData);
             this.emitSearchResult(latitude, longitude, city, state, weatherData);
           })
           .catch(error => {
@@ -178,6 +169,7 @@ export class SearchFormComponent implements OnInit {
   }
 
   emitSearchResult(latitude: number, longitude: number, city: string, state: string, weatherData: any): void {
+    console.log('Emitting search result:', { latitude, longitude, city, state, weatherData });
     this.searchCompleted.emit({ latitude, longitude, city, state, weatherData });
   }
 }

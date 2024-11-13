@@ -1,0 +1,45 @@
+
+.results-container {
+  width: 100%;
+  height: 100%; 
+}
+
+.tabs-container {
+  border-bottom: 1px solid #dee2e6;
+}
+
+.tab-button {
+  color: #007bff;
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+.tab-button.active {
+  font-weight: bold;
+  border-bottom: 2px solid #007bff;
+  color: #0056b3;
+}
+
+.tab-content {
+  padding-top: 10px;
+}
+
+.tab-content > div {
+  animation: fadeIn 0.3s;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.main-view,
+.detail-view {
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s ease-in-out;
+}

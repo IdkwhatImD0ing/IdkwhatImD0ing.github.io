@@ -1,18 +1,7 @@
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { DailyForecast, WeatherData } from '../../models';
 
-interface WeatherData {
-  timelines: any[];
-}
 
-interface DailyForecast {
-  date: string;
-  formattedDate: string;
-  weatherDescription: string;
-  weatherIcon: string;
-  tempHigh: number;
-  tempLow: number;
-  windSpeed: number;
-}
 
 @Component({
   selector: 'app-day-view',
@@ -21,7 +10,7 @@ interface DailyForecast {
 })
 export class DayViewComponent implements OnInit {
   @Input() weatherData: WeatherData | null = null;
-  @Output() rowClicked = new EventEmitter<string>();
+  @Output() daySelected = new EventEmitter<DailyForecast>();
 
   dailyForecast: DailyForecast[] = [];
 
@@ -99,7 +88,7 @@ export class DayViewComponent implements OnInit {
         const windSpeed = interval.values.windSpeed;
 
         this.dailyForecast.push({
-          date: interval.startTime,
+          index: index + 1,
           formattedDate,
           weatherDescription,
           weatherIcon,
@@ -111,7 +100,8 @@ export class DayViewComponent implements OnInit {
     }
   }
 
-  onRowClick(date: string): void {
-    this.rowClicked.emit(date);
+
+  onRowClick(day: DailyForecast): void {
+    this.daySelected.emit(day);
   }
 }
