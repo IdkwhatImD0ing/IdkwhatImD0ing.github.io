@@ -4,18 +4,25 @@ import { SearchResult } from './models';
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
 })
-
 export class AppComponent {
-  title = 'Weather App';
   searchResult: SearchResult | null = null;
-
+  activeTab = 1;
 
   onSearchCompleted(result: SearchResult): void {
-    console.log('Search completed:', result);
     this.searchResult = result;
+    this.activeTab = 1;
+  }
+
+  onFavoriteSelected(favorite: any): void {
+    console.log("Favorite selected:", favorite);
+    this.searchResult = {
+      city: favorite.city,
+      state: favorite.state,
+      longitude: favorite.longitude,
+      latitude: favorite.latitude,
+    };
+    this.activeTab = 1;
   }
 }
-
-

@@ -1,4 +1,3 @@
-// src/app/meteogram/meteogram.component.ts
 import { Component, Input, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import WindBarb from 'highcharts/modules/windbarb';

@@ -1,7 +1,13 @@
+/* src/app/results/results.component.css */
 
 .results-container {
+  display: flex;
+  flex-direction: row;
   width: 100%;
-  height: 100%; 
+  height: 100%; /* Ensure the container fills the available space */
+  overflow: hidden; /* Prevent scrollbars during animations */
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 .tabs-container {
@@ -24,22 +30,13 @@
   padding-top: 10px;
 }
 
-.tab-content > div {
-  animation: fadeIn 0.3s;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
 .main-view,
 .detail-view {
+  flex: 0 0 100%; /* Each view takes full width */
   width: 100%;
   height: 100%;
-  transition: transform 0.3s ease-in-out;
+  background-color: white;
+  padding: 20px;
+  box-sizing: border-box;
+  /* Removed conflicting transitions as animations are handled by Angular */
 }

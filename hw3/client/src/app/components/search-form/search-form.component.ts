@@ -76,18 +76,7 @@ export class SearchFormComponent implements OnInit {
         const longitude = parseFloat(loc[1]);
         const city = dataLocation.city;
         const state = dataLocation.region;
-
-
-
-        fetch(`http://localhost:3000/get_weather?latitude=${latitude}&longitude=${longitude}`)
-          .then(response => response.json())
-          .then(weatherData => {
-            this.emitSearchResult(latitude, longitude, city, state, weatherData);
-          })
-          .catch(error => {
-            console.error('Error fetching weather:', error);
-            alert('Failed to fetch weather information.');
-          });
+        this.emitSearchResult(latitude, longitude, city, state);
 
         this.isFetchingLocation = false;
       })
@@ -126,7 +115,7 @@ export class SearchFormComponent implements OnInit {
 
   isSearchDisabled(): boolean {
     if (this.searchForm.get('currentLocation')?.value) {
-      return this.isFetchingLocation; // Disable if location is being fetched
+      return this.isFetchingLocation;
     }
     return this.searchForm.invalid;
   }
@@ -168,9 +157,9 @@ export class SearchFormComponent implements OnInit {
     return '';
   }
 
-  emitSearchResult(latitude: number, longitude: number, city: string, state: string, weatherData: any): void {
-    console.log('Emitting search result:', { latitude, longitude, city, state, weatherData });
-    this.searchCompleted.emit({ latitude, longitude, city, state, weatherData });
+  emitSearchResult(latitude: number, longitude: number, city: string, state: string): void {
+    console.log('Emitting search result:', { latitude, longitude, city, state });
+    this.searchCompleted.emit({ latitude, longitude, city, state });
   }
 }
 

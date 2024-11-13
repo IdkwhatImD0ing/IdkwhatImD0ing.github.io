@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, Output, EventEmitter, SimpleChanges, OnChanges } from '@angular/core';
 import { DailyForecast, WeatherData } from '../../models';
 
 
@@ -67,9 +67,25 @@ export class DayViewComponent implements OnInit {
     8000: 'Thunderstorm',
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['weatherData'] && changes['weatherData'].currentValue) {
+      this.weatherData = changes['weatherData'].currentValue;
+      if (this.weatherData) {
+        this.updateData(this.weatherData);
+      }
+    }
+  }
+
   ngOnInit(): void {
     if (this.weatherData) {
-      const dailyTimeline = this.weatherData.timelines.find(
+      this.updateData(this.weatherData);
+    }
+  }
+
+  updateData(weatherData: WeatherData): void {
+    this.dailyForecast = [];
+    if (weatherData) {
+      const dailyTimeline = weatherData.timelines.find(
         (timeline) => timeline.timestep === '1d'
       );
 

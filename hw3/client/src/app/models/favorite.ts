@@ -1,8 +1,8 @@
-interface SearchResult {
+interface Favorite {
     city: string;
     state: string;
     latitude: number;
     longitude: number;
 }
 
-export type { SearchResult };
+export type { Favorite };

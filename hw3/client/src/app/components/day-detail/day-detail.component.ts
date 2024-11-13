@@ -1,8 +1,5 @@
-// src/app/day-detail/day-detail.component.ts
 import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { DailyForecast, SearchResult, WeatherDetails } from '../../models';
-
-
 
 
 @Component({
@@ -12,17 +9,17 @@ import { DailyForecast, SearchResult, WeatherDetails } from '../../models';
 })
 export class DayDetailComponent implements OnInit {
   @Input() dayData: DailyForecast | null = null;
-  @Input() searchResult: SearchResult | null = null;
+  @Input() weatherData: any = null;
   @Output() goBack = new EventEmitter<void>();
   @Output() postToX = new EventEmitter<void>();
 
   weatherDetails: WeatherDetails | null = null;
 
   ngOnInit(): void {
-    if (this.searchResult) {
-      console.log(this.searchResult);
+    if (this.weatherData) {
+      console.log(this.weatherData);
 
-      const dailyTimeline = this.searchResult.weatherData.timelines.find(
+      const dailyTimeline = this.weatherData.timelines.find(
         (timeline: any) => timeline.timestep === '1d'
       );
 
@@ -49,8 +46,8 @@ export class DayDetailComponent implements OnInit {
             windSpeed: selectedInterval.values.windSpeed,
             visibility: selectedInterval.values.visibility,
             cloudCover: selectedInterval.values.cloudCover,
-            latitude: this.searchResult.latitude,
-            longitude: this.searchResult.longitude,
+            latitude: this.weatherData.latitude,
+            longitude: this.weatherData.longitude,
           };
           console.log(this.weatherDetails);
         }

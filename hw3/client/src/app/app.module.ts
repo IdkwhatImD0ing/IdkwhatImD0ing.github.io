@@ -24,11 +24,15 @@ import { DailyTempChartComponent } from './components/daily-temp-chart/daily-tem
 import { MeteogramComponent } from './components/meteogram/meteogram.component';
 import { DayDetailComponent } from './components/day-detail/day-detail.component';
 
+// Favorites
+import { FavoritesComponent } from './favorites/favorites.component';
+
 // Highcharts
 import { HighchartsChartModule } from 'highcharts-angular';
 
 // Google Maps
 import { GoogleMapsModule } from '@angular/google-maps';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
     declarations: [
@@ -38,7 +42,8 @@ import { GoogleMapsModule } from '@angular/google-maps';
         DayViewComponent,
         DailyTempChartComponent,
         MeteogramComponent,
-        DayDetailComponent
+        DayDetailComponent,
+        FavoritesComponent
     ],
     imports: [
         BrowserModule,
@@ -52,7 +57,8 @@ import { GoogleMapsModule } from '@angular/google-maps';
         MatSelectModule,
         MatTabsModule,
         HighchartsChartModule,
-        GoogleMapsModule
+        GoogleMapsModule,
+        NgbModule
     ],
     providers: [
         provideHttpClient(withFetch()),

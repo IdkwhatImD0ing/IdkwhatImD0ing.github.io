@@ -1,4 +1,3 @@
-// src/app/daily-temp-chart/daily-temp-chart.component.ts
 import { Component, Input, OnInit } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import HighchartsMore from 'highcharts/highcharts-more';

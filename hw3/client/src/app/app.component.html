@@ -1,10 +1,26 @@
-<!-- src/app/app.component.html -->
 <div class="container">
-  <!-- Search Form Component -->
   <app-search-form
     (searchCompleted)="onSearchCompleted($event)"
   ></app-search-form>
 
-  <!-- Results Component -->
-  <app-results *ngIf="searchResult" [searchResult]="searchResult"></app-results>
+  <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs mt-3">
+    <li [ngbNavItem]="1">
+      <a ngbNavLink>Results</a>
+      <ng-template ngbNavContent>
+        <app-results
+          *ngIf="searchResult"
+          [searchResult]="searchResult"
+        ></app-results>
+      </ng-template>
+    </li>
+    <li [ngbNavItem]="2">
+      <a ngbNavLink>Favorites</a>
+      <ng-template ngbNavContent>
+        <app-favorites
+          (favoriteSelected)="onFavoriteSelected($event)"
+        ></app-favorites>
+      </ng-template>
+    </li>
+  </ul>
+  <div [ngbNavOutlet]="nav"></div>
 </div>
