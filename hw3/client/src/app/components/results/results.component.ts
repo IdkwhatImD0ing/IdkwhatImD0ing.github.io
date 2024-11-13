@@ -65,6 +65,10 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
   detailViewState: 'active' | 'inactive' = 'inactive';
   isFavorite: boolean = false;
   errorMessage: string = '';
+  previousDay: DailyForecast | null = null;
+  isLoading: boolean = false;
+  progressValue: number = 0;
+  progressInterval: any;
 
   constructor(private favoritesService: FavoritesService, private http: HttpClient) { }
 
@@ -91,13 +95,33 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   fetchWeatherData(latitude: number, longitude: number): void {
+    this.isLoading = true;
+    this.progressValue = 0;
+    console.log("Fetching weather data...");
+
+    this.progressInterval = setInterval(() => {
+      if (this.progressValue < 90) {
+        this.progressValue += 10;
+      }
+    }, 100);
+
     this.http.get(`http://localhost:3000/get_weather?latitude=${latitude}&longitude=${longitude}`)
       .subscribe({
         next: (weatherData) => {
-          console.log("Weather data fetched:", weatherData);
-          this.weatherData = weatherData;
+          clearInterval(this.progressInterval);
+          this.progressValue = 100;
+
+          setTimeout(() => {
+            this.isLoading = false;
+
+            console.log("Weather data fetched:", weatherData);
+            this.weatherData = weatherData;
+          }, 500);
         },
         error: (error) => {
+          clearInterval(this.progressInterval);
+          this.progressValue = 0;
+          this.isLoading = false;
           console.error('Error fetching weather:', error);
           alert('Failed to fetch weather information.');
         }
@@ -131,14 +155,37 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
   }
 
   onDetails(): void {
-    alert('Showing detailed information!');
+    console.log(this.weatherData?.timelines[0].intervals[0].values);
+    if (!this.previousDay) {
+      const newDay = {
+        index: 1,
+        formattedDate: new Date(this.weatherData?.timelines[0].intervals[0].startTime).toLocaleDateString('en-US', {
+          weekday: 'long',
+          month: 'short',
+          day: '2-digit',
+          year: 'numeric'
+        }),
+        weatherDescription: this.weatherData?.timelines[0].intervals[0].values.weatherCode,
+        weatherIcon: this.weatherData?.timelines[0].intervals[0].values.weatherCode,
+        tempHigh: this.weatherData?.timelines[0].intervals[0].values.temperatureMax,
+        tempLow: this.weatherData?.timelines[0].intervals[0].values.temperatureMin,
+        windSpeed: this.weatherData?.timelines[0].intervals[0].values.windSpeed,
+      }
+      console.log("Default day selected:", newDay);
+      this.onDaySelected(newDay);
+    }
+    else {
+      this.onDaySelected(this.previousDay);
+    }
   }
 
   onDaySelected(day: DailyForecast): void {
     this.mainViewState = 'inactive';
     this.detailViewState = 'active';
+    console.log(day);
     setTimeout(() => {
       this.selectedDay = day;
+      this.previousDay = day;
 
     }, 100);
   }
@@ -153,9 +200,7 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
     }, 100);
   }
 
-  postToX(): void {
-    alert('Posted to X!');
-  }
+
 
   selectTab(tab: string): void {
     if (this.selectedTab !== tab) {

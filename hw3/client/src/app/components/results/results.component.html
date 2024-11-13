@@ -1,7 +1,14 @@
 <div class="results-container">
-  <!-- Main View -->
+  <div *ngIf="isLoading" class="progress mb-3 w-100">
+    <div
+      class="progress-bar progress-bar-striped progress-bar-animated"
+      role="progressbar"
+      [style.width]="progressValue + '%'"
+    ></div>
+  </div>
+
   <div
-    *ngIf="!selectedDay"
+    *ngIf="!selectedDay && !isLoading"
     class="main-view"
     [@mainViewAnimation]="mainViewState"
     [@.disabled]="isFirstRender"
@@ -77,8 +84,8 @@
     <app-day-detail
       [dayData]="selectedDay"
       [weatherData]="weatherData"
+      [searchResult]="searchResult"
       (goBack)="goBack()"
-      (postToX)="postToX()"
     >
     </app-day-detail>
   </div>

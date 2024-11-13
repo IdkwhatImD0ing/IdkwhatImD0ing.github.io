@@ -1,6 +1,7 @@
 <div class="container">
   <app-search-form
     (searchCompleted)="onSearchCompleted($event)"
+    (clear)="onClear()"
   ></app-search-form>
 
   <ul ngbNav #nav="ngbNav" [(activeId)]="activeTab" class="nav-tabs mt-3">

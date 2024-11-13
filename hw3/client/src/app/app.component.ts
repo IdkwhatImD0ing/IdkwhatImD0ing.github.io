@@ -25,4 +25,9 @@ export class AppComponent {
     };
     this.activeTab = 1;
   }
+
+  onClear(): void {
+    this.searchResult = null;
+    this.activeTab = 1;
+  }
 }

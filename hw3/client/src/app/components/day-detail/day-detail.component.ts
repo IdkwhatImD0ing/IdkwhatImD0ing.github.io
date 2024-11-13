@@ -2,6 +2,7 @@ import { Component, Input, OnInit, Output, EventEmitter } from '@angular/core';
 import { DailyForecast, SearchResult, WeatherDetails } from '../../models';
 
 
+
 @Component({
   selector: 'app-day-detail',
   templateUrl: './day-detail.component.html',
@@ -10,14 +11,16 @@ import { DailyForecast, SearchResult, WeatherDetails } from '../../models';
 export class DayDetailComponent implements OnInit {
   @Input() dayData: DailyForecast | null = null;
   @Input() weatherData: any = null;
+  @Input() searchResult: SearchResult | null = null;
   @Output() goBack = new EventEmitter<void>();
-  @Output() postToX = new EventEmitter<void>();
 
   weatherDetails: WeatherDetails | null = null;
 
   ngOnInit(): void {
     if (this.weatherData) {
-      console.log(this.weatherData);
+      console.log("Weather data on init:", this.weatherData);
+      console.log("Search result on init:", this.searchResult);
+      console.log("Day data on init:", this.dayData);
 
       const dailyTimeline = this.weatherData.timelines.find(
         (timeline: any) => timeline.timestep === '1d'
@@ -46,10 +49,10 @@ export class DayDetailComponent implements OnInit {
             windSpeed: selectedInterval.values.windSpeed,
             visibility: selectedInterval.values.visibility,
             cloudCover: selectedInterval.values.cloudCover,
-            latitude: this.weatherData.latitude,
-            longitude: this.weatherData.longitude,
+            latitude: this.searchResult?.latitude || 0,
+            longitude: this.searchResult?.longitude || 0,
           };
-          console.log(this.weatherDetails);
+          console.log("this.weatherDetails", this.weatherDetails);
         }
       }
 
@@ -91,6 +94,16 @@ export class DayDetailComponent implements OnInit {
   }
 
   handlePostToX(): void {
-    this.postToX.emit();
+    const city = this.searchResult?.city || '';
+    const state = this.searchResult?.state || '';
+
+    const formattedDate = this.dayData?.formattedDate || '';
+    const temp = this.weatherDetails?.tempMax || '';
+    const summary = this.weatherDetails?.status || '';
+
+    const tweetText = `The temperature in ${city}, ${state} on ${formattedDate} is ${temp}°F. The weather conditions are ${summary} #CSCI571WeatherSearch`;
+
+    const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+    window.open(tweetUrl, '_blank');
   }
 }

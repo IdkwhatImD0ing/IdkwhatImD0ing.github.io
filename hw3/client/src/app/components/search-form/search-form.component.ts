@@ -2,6 +2,7 @@ import { Component, OnInit, Output, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { AutocompleteService } from '../../services/autocomplete.service';
 import { SearchResult } from '../../models';
+import { GeocodeService } from '../../services/geocode.service';
 
 @Component({
   selector: 'app-search-form',
@@ -10,7 +11,7 @@ import { SearchResult } from '../../models';
 })
 export class SearchFormComponent implements OnInit {
   @Output() searchCompleted = new EventEmitter<SearchResult>();
-
+  @Output() clear = new EventEmitter<void>();
   searchForm: FormGroup;
   stateOptions: string[] = [
     'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut',
@@ -28,7 +29,8 @@ export class SearchFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private autocompleteService: AutocompleteService
+    private autocompleteService: AutocompleteService,
+    private geocodeService: GeocodeService
   ) {
     this.searchForm = this.fb.group({
       currentLocation: [false],
@@ -96,7 +98,7 @@ export class SearchFormComponent implements OnInit {
     this.searchForm.get('city')?.valueChanges.subscribe(value => {
       this.autocompleteService.getCityPredictions(value).subscribe(
         (cities: string[]) => {
-          this.filteredCities = cities;
+          this.filteredCities = cities.map(city => city.split(',')[0]);
         },
         (error) => {
           console.error('Autocomplete error:', error);
@@ -108,7 +110,7 @@ export class SearchFormComponent implements OnInit {
 
   onCitySelected(selected: string): void {
 
-    console.log('Selected city:', selected);
+    this.searchForm.get('city')?.setValue(selected.split(',')[0]);
 
   }
 
@@ -127,7 +129,16 @@ export class SearchFormComponent implements OnInit {
       if (formData.currentLocation) {
         this.getCurrentLocation();
       } else {
-        console.log('Search Data:', formData);
+        const address = `${formData.street}, ${formData.city}, ${formData.state}`;
+        this.geocodeService.geocodeAddress(address).subscribe(
+          (location: { lat: number, lng: number } | null) => {
+            if (location) {
+              this.emitSearchResult(location.lat, location.lng, formData.city, formData.state);
+            } else {
+              console.error('Geocoding failed for address:', address);
+            }
+          }
+        );
       }
     }
   }
@@ -141,8 +152,7 @@ export class SearchFormComponent implements OnInit {
     });
     this.filteredCities = [];
     this.isAutocompleteEnabled = true;
-
-    console.log('Form cleared');
+    this.clear.emit();
   }
 
 

@@ -1,45 +1,38 @@
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { Injectable, NgZone } from '@angular/core';
+import { Observable, from } from 'rxjs';
 
-interface AutocompletePrediction {
-  description: string;
-  terms: { value: string }[];
-}
+declare var google: any;
 
 @Injectable({
   providedIn: 'root'
 })
 export class AutocompleteService {
-  private apiKey: string = environment.googleApiKey;
+  private autocompleteService: any;
 
-  constructor(private http: HttpClient) { }
+  constructor(private ngZone: NgZone) {
+    this.autocompleteService = new google.maps.places.AutocompleteService();
+  }
 
   getCityPredictions(input: string): Observable<string[]> {
     if (!input.trim()) {
-      return of([]);
+      return from(Promise.resolve([]));
     }
 
-    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=(cities)&key=${this.apiKey}`;
-
-    return this.http.get<any>(url).pipe(
-      map(response => {
-        if (response.status === 'OK') {
-          return response.predictions.map((pred: AutocompletePrediction) => {
-            const city = pred.terms[0]?.value || '';
-            const state = pred.terms[1]?.value || '';
-            return city;
-          });
-        } else {
-          return [];
+    return from(new Promise<string[]>((resolve, reject) => {
+      this.autocompleteService.getPlacePredictions(
+        {
+          input: input,
+          types: ['(cities)']
+        },
+        (predictions: any[], status: any) => {
+          if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+            const cities = predictions.map(pred => pred.description);
+            this.ngZone.run(() => resolve(cities));
+          } else {
+            resolve([]);
+          }
         }
-      }),
-      catchError(error => {
-        console.error('Autocomplete API error:', error);
-        return of([]);
-      })
-    );
+      );
+    }));
   }
 }
