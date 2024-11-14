@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, SimpleChanges, OnChanges, Output, EventEmitter } from '@angular/core';
 import { SearchResult, DailyForecast } from '../../models';
 import { trigger, transition, animate, style, state } from '@angular/animations';
 import { FavoritesService } from '../../services/favorites.service';
@@ -57,6 +57,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() searchResult: SearchResult | null = null;
+  @Output() resultsLoaded = new EventEmitter<void>();
   weatherData: any = null;
   selectedDay: DailyForecast | null = null;
   selectedTab: string = 'dayView';
@@ -73,7 +74,6 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
   constructor(private favoritesService: FavoritesService, private http: HttpClient) { }
 
   ngOnInit(): void {
-    // Initial fetch if searchResult is already set
     if (this.searchResult) {
       this.fetchWeatherData(this.searchResult.latitude, this.searchResult.longitude);
     }
@@ -98,6 +98,12 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
     this.isLoading = true;
     this.progressValue = 0;
     console.log("Fetching weather data...");
+    this.resultsLoaded.emit();
+    if (this.selectedDay) {
+      this.selectedDay = null;
+      this.mainViewState = 'active';
+      this.detailViewState = 'inactive';
+    }
 
     this.progressInterval = setInterval(() => {
       if (this.progressValue < 90) {
@@ -113,6 +119,7 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
 
           setTimeout(() => {
             this.isLoading = false;
+
 
             console.log("Weather data fetched:", weatherData);
             this.weatherData = weatherData;

@@ -1,12 +1,9 @@
-/* src/app/results/results.component.css */
-
 .results-container {
   display: flex;
   flex-direction: row;
   width: 100%;
-  height: 100%; /* Ensure the container fills the available space */
-  overflow: hidden; /* Prevent scrollbars during animations */
-  padding: 20px;
+  height: 100%;
+  overflow: hidden;
   box-sizing: border-box;
 }
 
@@ -32,11 +29,9 @@
 
 .main-view,
 .detail-view {
-  flex: 0 0 100%; /* Each view takes full width */
+  flex: 0 0 100%;
   width: 100%;
   height: 100%;
   background-color: white;
-  padding: 20px;
   box-sizing: border-box;
-  /* Removed conflicting transitions as animations are handled by Angular */
 }

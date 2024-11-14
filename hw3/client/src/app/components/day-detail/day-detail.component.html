@@ -1,49 +1,67 @@
 <div class="day-detail">
   <!-- Header -->
-  <div
-    class="header d-flex justify-content-between align-items-center p-3 bg-light"
-  >
-    <button class="btn btn-link" (click)="handleGoBack()">
-      <i class="fa fa-arrow-left"></i> List
+  <div class="header d-flex justify-content-between align-items-center p-3">
+    <!-- List Button with Border and Left Chevron -->
+    <button
+      class="btn btn-outline-secondary d-flex align-items-center"
+      (click)="handleGoBack()"
+    >
+      <i class="bi bi-chevron-left me-2"></i> List
     </button>
-    <h5>{{ dayData?.formattedDate }}</h5>
-    <button class="btn btn-link" (click)="handlePostToX()">
+
+    <!-- Centered Title with White Background -->
+    <h5 class="m-0 text-center p-2 rounded">
+      {{ dayData?.formattedDate }}
+    </h5>
+
+    <!-- X Button with Border -->
+    <button class="btn btn-outline-secondary" (click)="handlePostToX()">
       <img src="/twitter-x.svg" alt="X logo" />
     </button>
   </div>
 
   <!-- Details List -->
   <div class="details p-3">
-    <ul class="list-group">
-      <li class="list-group-item">
-        <strong>Status:</strong> {{ weatherDetails?.status }}
+    <ul class="list-group list-group-flush">
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Status</strong>
+        <span>{{ weatherDetails?.status }}</span>
       </li>
-      <li class="list-group-item">
-        <strong>Max Temp:</strong> {{ weatherDetails?.tempMax }}°F
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Max Temperature</strong>
+        <span>{{ weatherDetails?.tempMax }}°F</span>
       </li>
-      <li class="list-group-item">
-        <strong>Min Temp:</strong> {{ weatherDetails?.tempMin }}°F
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Min Temperature</strong>
+        <span>{{ weatherDetails?.tempMin }}°F</span>
       </li>
-      <li class="list-group-item">
-        <strong>Apparent Temp:</strong> {{ weatherDetails?.apparentTemp }}°F
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Apparent Temperature</strong>
+        <span>{{ weatherDetails?.apparentTemp }}°F</span>
       </li>
-      <li class="list-group-item">
-        <strong>Sun Rise:</strong> {{ weatherDetails?.sunRise }}
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Sun Rise Time</strong>
+        <span>{{ weatherDetails?.sunRise | date : "shortTime" }}</span>
       </li>
-      <li class="list-group-item">
-        <strong>Sun Set:</strong> {{ weatherDetails?.sunSet }}
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Sun Set Time</strong>
+        <span>{{ weatherDetails?.sunSet | date : "shortTime" }}</span>
       </li>
-      <li class="list-group-item">
-        <strong>Humidity:</strong> {{ weatherDetails?.humidity }}%
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Humidity</strong>
+        <span>{{ weatherDetails?.humidity }}%</span>
       </li>
-      <li class="list-group-item">
-        <strong>Wind Speed:</strong> {{ weatherDetails?.windSpeed }} mph
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Wind Speed</strong>
+        <span>{{ weatherDetails?.windSpeed }} mph</span>
       </li>
-      <li class="list-group-item">
-        <strong>Visibility:</strong> {{ weatherDetails?.visibility }} miles
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Visibility</strong>
+        <span>{{ weatherDetails?.visibility }} miles</span>
       </li>
-      <li class="list-group-item">
-        <strong>Cloud Cover:</strong> {{ weatherDetails?.cloudCover }}%
+      <li class="list-group-item d-flex">
+        <strong class="me-10">Cloud Cover</strong>
+        <span>{{ weatherDetails?.cloudCover }}%</span>
       </li>
     </ul>
   </div>

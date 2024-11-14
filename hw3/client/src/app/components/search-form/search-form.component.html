@@ -1,111 +1,188 @@
-<form [formGroup]="searchForm" class="container mt-4">
-  <!-- Current Location Checkbox -->
-  <div class="form-check mb-3">
-    <input
-      type="checkbox"
-      class="form-check-input"
-      id="currentLocation"
-      formControlName="currentLocation"
-    />
-    <label class="form-check-label" for="currentLocation"
-      >Use Current Location</label
-    >
-  </div>
+<!-- Container with Slightly Gray Background -->
+<div class="container mt-4 p-4 bg-light rounded">
+  <!-- Weather Search Header -->
+  <h2 class="text-center mb-4">Weather Search</h2>
 
-  <!-- Street Field -->
-  <div class="mb-3">
-    <mat-form-field class="w-100" appearance="outline">
-      <mat-label>Street</mat-label>
-      <input matInput formControlName="street" placeholder="Enter street" />
-      <mat-error *ngIf="searchForm.get('street')?.hasError('required')">
-        Street is required
-      </mat-error>
-      <mat-error *ngIf="searchForm.get('street')?.hasError('whitespace')">
-        Street cannot be empty
-      </mat-error>
-    </mat-form-field>
-  </div>
+  <form [formGroup]="searchForm">
+    <!-- Form Fields: Street, City, State -->
 
-  <!-- City Field with Autocomplete -->
-  <div class="mb-3">
-    <mat-form-field
-      class="w-100"
-      appearance="outline"
-      *ngIf="isAutocompleteEnabled"
-    >
-      <mat-label>City</mat-label>
-      <input
-        type="text"
-        matInput
-        formControlName="city"
-        [matAutocomplete]="auto"
-        placeholder="Enter city"
-      />
-      <mat-autocomplete
-        #auto="matAutocomplete"
-        (optionSelected)="onCitySelected($event.option.value)"
-      >
-        <mat-option *ngFor="let city of filteredCities" [value]="city">
-          {{ city }}
-        </mat-option>
-      </mat-autocomplete>
-      <mat-error *ngIf="searchForm.get('city')?.hasError('required')">
-        City is required
-      </mat-error>
-      <mat-error *ngIf="searchForm.get('city')?.hasError('whitespace')">
-        City cannot be empty
-      </mat-error>
-    </mat-form-field>
+    <!-- Street Field -->
+    <div class="row align-items-center">
+      <div class="col-md-4 text-left desktop-padding">
+        <label for="street" class="form-label">
+          Street <span class="text-danger">*</span>
+        </label>
+      </div>
 
-    <!-- Fallback City Field without Autocomplete -->
-    <div *ngIf="!isAutocompleteEnabled" class="w-100">
-      <div class="input-group">
-        <input
-          type="text"
-          class="form-control"
-          formControlName="city"
-          placeholder="Enter city"
-        />
-        <div
-          class="invalid-feedback d-block"
-          *ngIf="
-            searchForm.get('city')?.invalid &&
-            (searchForm.get('city')?.dirty || searchForm.get('city')?.touched)
-          "
-        >
-          {{ getCityErrorMessage() }}
+      <div class="col-md-8">
+        <mat-form-field appearance="outline" class="w-100">
+          <input
+            matInput
+            formControlName="street"
+            id="street"
+            placeholder="Enter street"
+          />
+          <mat-error
+            *ngIf="
+              searchForm.get('street')?.hasError('required') ||
+              searchForm.get('street')?.hasError('whitespace')
+            "
+          >
+            Please enter a valid street
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- City Field -->
+    <div class="row align-items-center">
+      <div class="col-md-4 text-left desktop-padding">
+        <label for="city" class="form-label">
+          City <span class="text-danger">*</span>
+        </label>
+      </div>
+      <div class="col-md-8">
+        <!-- Conditional Autocomplete -->
+        <ng-container *ngIf="isAutocompleteEnabled; else fallbackCityField">
+          <mat-form-field appearance="outline" class="w-100">
+            <input
+              type="text"
+              matInput
+              formControlName="city"
+              id="city"
+              [matAutocomplete]="auto"
+              placeholder="Enter city"
+            />
+            <mat-autocomplete
+              #auto="matAutocomplete"
+              (optionSelected)="onCitySelected($event.option.value)"
+            >
+              <mat-option *ngFor="let city of filteredCities" [value]="city">
+                {{ city }}
+              </mat-option>
+            </mat-autocomplete>
+            <mat-error
+              *ngIf="
+                searchForm.get('city')?.hasError('required') ||
+                searchForm.get('city')?.hasError('whitespace')
+              "
+            >
+              Please enter a valid city
+            </mat-error>
+          </mat-form-field>
+        </ng-container>
+
+        <!-- Fallback City Field without Autocomplete -->
+        <ng-template #fallbackCityField>
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              formControlName="city"
+              id="city"
+              placeholder="Enter city"
+            />
+            <div
+              class="invalid-feedback d-block"
+              *ngIf="
+                searchForm.get('city')?.invalid &&
+                (searchForm.get('city')?.dirty ||
+                  searchForm.get('city')?.touched)
+              "
+            >
+              {{ getCityErrorMessage() }}
+            </div>
+          </div>
+        </ng-template>
+      </div>
+    </div>
+
+    <!-- State Field -->
+    <div class="row align-items-center">
+      <div class="col-md-4 text-left desktop-padding">
+        <label for="state" class="form-label">
+          State <span class="text-danger">*</span>
+        </label>
+      </div>
+      <div class="col-md-8">
+        <mat-form-field appearance="outline" class="w-100">
+          <mat-select
+            formControlName="state"
+            id="state"
+            placeholder="Select state"
+          >
+            <mat-option *ngFor="let state of stateOptions" [value]="state">
+              {{ state }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="searchForm.get('state')?.hasError('required')">
+            State is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <hr />
+
+    <!-- Autodetect Location Section -->
+    <div class="row my-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-center align-items-center">
+          <label class="form-label me-2">
+            Autodetect Location <span class="text-danger">*</span>
+          </label>
+          <div class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              id="currentLocation"
+              formControlName="currentLocation"
+              [ngStyle]="{
+                'background-color': searchForm.get('currentLocation')?.value
+                  ? '#ffd700'
+                  : ''
+              }"
+            />
+            <label class="form-check-label" for="currentLocation">
+              Use Current Location
+            </label>
+          </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- State Field -->
-  <div class="mb-3">
-    <mat-form-field class="w-100" appearance="outline">
-      <mat-label>State</mat-label>
-      <mat-select formControlName="state" placeholder="Select state">
-        <mat-option *ngFor="let state of stateOptions" [value]="state">
-          {{ state }}
-        </mat-option>
-      </mat-select>
-      <mat-error *ngIf="searchForm.get('state')?.hasError('required')">
-        State is required
-      </mat-error>
-    </mat-form-field>
-  </div>
-
-  <!-- Buttons -->
-  <div class="d-flex justify-content-between">
-    <button
-      type="button"
-      class="btn btn-primary"
-      [disabled]="isSearchDisabled()"
-      (click)="onSearch()"
-    >
-      Search
-    </button>
-    <button type="button" class="btn btn-secondary" (click)="onClear()">
-      Clear
-    </button>
-  </div>
-</form>
+    <!-- Buttons -->
+    <div class="row">
+      <div class="col-12 text-center">
+        <button
+          type="button"
+          class="btn btn-primary me-2"
+          [disabled]="isSearchDisabled()"
+          (click)="onSearch()"
+        >
+          <i class="bi bi-search me-1"></i> Search
+        </button>
+        <button
+          type="button"
+          class="btn btn-outline-secondary"
+          (click)="onClear()"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="16"
+            height="16"
+            fill="currentColor"
+            class="me-1"
+            viewBox="0 0 16 16"
+          >
+            <rect x="1" y="2" width="12" height="1" />
+            <rect x="2" y="6" width="12" height="1" />
+            <rect x="3" y="10" width="12" height="1" />
+          </svg>
+          Clear
+        </button>
+      </div>
+    </div>
+  </form>
+</div>
