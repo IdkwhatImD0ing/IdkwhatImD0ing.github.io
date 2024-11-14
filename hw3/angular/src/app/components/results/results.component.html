@@ -1,0 +1,110 @@
+<div class="results-container">
+  <!-- Loading Progress Bar -->
+  <div *ngIf="isLoading" class="progress mb-3 w-100">
+    <div
+      class="progress-bar progress-bar-striped progress-bar-animated"
+      role="progressbar"
+      [style.width]="progressValue + '%'"
+    ></div>
+  </div>
+
+  <!-- Error Alert -->
+  <ngb-alert *ngIf="errorMessage" [dismissible]="false" type="danger">
+    An error occurred, please try again later.
+  </ngb-alert>
+
+  <!-- Main View -->
+  <div
+    *ngIf="!selectedDay && !isLoading"
+    class="main-view"
+    [@mainViewAnimation]="mainViewState"
+    [@.disabled]="isFirstRender"
+  >
+    <!-- Centered Title -->
+    <h2 class="text-center">{{ getTitle() }}</h2>
+
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-end mb-3">
+      <!-- Favorite Button -->
+      <button
+        class="btn me-2"
+        [ngStyle]="{ color: isFavorite ? '#ffd700' : '#000000' }"
+        style="border: 1px solid #000000"
+        (click)="onFavorite()"
+        onmouseover="this.style.backgroundColor='#808080'"
+        onmouseout="this.style.backgroundColor=''"
+      >
+        <i
+          class="bi"
+          [class.bi-star-fill]="isFavorite"
+          [class.bi-star]="!isFavorite"
+        ></i>
+      </button>
+
+      <!-- Details Button without Border and with Right Icon -->
+      <button
+        class="btn d-flex align-items-center"
+        style="background: none; border: none"
+        (click)="onDetails()"
+      >
+        Details
+        <i class="bi bi-chevron-right ms-2"></i>
+      </button>
+    </div>
+
+    <!-- Navigation Tabs Aligned to the Right -->
+    <div class="d-flex">
+      <ul
+        ngbNav
+        #nav="ngbNav"
+        [(activeId)]="selectedTab"
+        class="nav nav-tabs w-100 justify-content-end"
+      >
+        <!-- Day View Tab -->
+        <li ngbNavItem="dayView" class="nav-item">
+          <button ngbNavLink class="nav-link">Day View</button>
+          <ng-template ngbNavContent>
+            <app-day-view
+              (daySelected)="onDaySelected($event)"
+              [weatherData]="weatherData"
+            ></app-day-view>
+          </ng-template>
+        </li>
+
+        <!-- Daily Temp Chart Tab -->
+        <li ngbNavItem="dailyTempChart" class="nav-item">
+          <button ngbNavLink class="nav-link">Daily Temp Chart</button>
+          <ng-template ngbNavContent>
+            <app-daily-temp-chart [weatherData]="weatherData">
+            </app-daily-temp-chart>
+          </ng-template>
+        </li>
+
+        <!-- Meteogram Tab -->
+        <li ngbNavItem="meteogram" class="nav-item">
+          <button ngbNavLink class="nav-link">Meteogram</button>
+          <ng-template ngbNavContent>
+            <app-meteogram [weatherData]="weatherData"></app-meteogram>
+          </ng-template>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Navigation Content Outlet -->
+    <div [ngbNavOutlet]="nav" class="mt-3"></div>
+  </div>
+
+  <!-- Detail View -->
+  <div
+    *ngIf="selectedDay"
+    class="detail-view"
+    [@detailViewAnimation]="detailViewState"
+  >
+    <app-day-detail
+      [dayData]="selectedDay"
+      [weatherData]="weatherData"
+      [searchResult]="searchResult"
+      (goBack)="goBack()"
+    ></app-day-detail>
+  </div>
+</div>
