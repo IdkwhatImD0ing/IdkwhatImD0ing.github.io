@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, AfterViewInit, SimpleChanges, OnChanges, Output, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, AfterViewInit, SimpleChanges, OnChanges, Output, EventEmitter, input } from '@angular/core';
 import { SearchResult, DailyForecast } from '../../models';
 import { trigger, transition, animate, style, state } from '@angular/animations';
 import { FavoritesService } from '../../services/favorites.service';
@@ -57,7 +57,9 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
   @Input() searchResult: SearchResult | null = null;
+  @Input() errorMessage: string = '';
   @Output() resultsLoaded = new EventEmitter<void>();
+  @Output() setErrorMessage = new EventEmitter<string>();
   weatherData: any = null;
   selectedDay: DailyForecast | null = null;
   selectedTab: string = 'dayView';
@@ -65,7 +67,7 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
   mainViewState: 'active' | 'inactive' = 'active';
   detailViewState: 'active' | 'inactive' = 'inactive';
   isFavorite: boolean = false;
-  errorMessage: string = '';
+
   previousDay: DailyForecast | null = null;
   isLoading: boolean = false;
   progressValue: number = 0;
@@ -111,14 +113,16 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
       }
     }, 100);
 
-    this.http.get(`http://localhost:3000/get_weather?latitude=${latitude}&longitude=${longitude}`)
+    this.http.get(`https://express-server-205907697136.us-central1.run.app/get_weather?latitude=${latitude}&longitude=${longitude}`)
       .subscribe({
         next: (weatherData) => {
           clearInterval(this.progressInterval);
           this.progressValue = 100;
+          this.setErrorMessage.emit('');
 
           setTimeout(() => {
             this.isLoading = false;
+
 
 
             console.log("Weather data fetched:", weatherData);
@@ -130,7 +134,7 @@ export class ResultsComponent implements OnInit, AfterViewInit, OnChanges {
           this.progressValue = 0;
           this.isLoading = false;
           console.error('Error fetching weather:', error);
-          alert('Failed to fetch weather information.');
+          this.setErrorMessage.emit('An error occurred please try again later.');
         }
       });
   }

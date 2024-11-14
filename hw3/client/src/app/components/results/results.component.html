@@ -8,6 +8,11 @@
     ></div>
   </div>
 
+  <!-- Error Alert -->
+  <ngb-alert *ngIf="errorMessage" [dismissible]="false" type="danger">
+    An error occurred, please try again later.
+  </ngb-alert>
+
   <!-- Main View -->
   <div
     *ngIf="!selectedDay && !isLoading"

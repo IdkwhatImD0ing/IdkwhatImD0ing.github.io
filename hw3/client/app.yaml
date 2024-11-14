@@ -1,0 +1,10 @@
+runtime: python310
+
+handlers:
+  - url: /(.*\.(css|js|png|jpg|jpeg|gif|ico|svg|eot|ttf|woff|woff2))
+    static_files: dist/client/browser/\1
+    upload: dist/client/browser/.*\.(css|js|png|jpg|jpeg|gif|ico|svg|eot|ttf|woff|woff2)
+
+  - url: /.*
+    static_files: dist/client/browser/index.html
+    upload: dist/client/browser/index.html

@@ -1,4 +1,4 @@
-import { Component, OnInit, Output, EventEmitter } from '@angular/core';
+import { Component, OnInit, Output, EventEmitter, Input } from '@angular/core';
 import { FavoritesService } from '../services/favorites.service';
 import { Favorite } from '../models/favorite';
 
@@ -9,9 +9,9 @@ import { Favorite } from '../models/favorite';
 })
 export class FavoritesComponent implements OnInit {
   favorites: Favorite[] = [];
-  errorMessage: string = '';
+  @Input() errorMessage: string = '';
   @Output() favoriteSelected = new EventEmitter<Favorite>();
-
+  @Output() setErrorMessage = new EventEmitter<string>();
   constructor(private favoritesService: FavoritesService) { }
 
   ngOnInit(): void {
@@ -22,9 +22,10 @@ export class FavoritesComponent implements OnInit {
     this.favoritesService.listFavorites().subscribe({
       next: (response) => {
         this.favorites = response.favorites;
+        this.setErrorMessage.emit('');
       },
       error: (error) => {
-        this.errorMessage = error.error.error || 'An error occurred while fetching favorites.';
+        this.setErrorMessage.emit('An error occurred while fetching favorites.');
       },
     });
   }
@@ -38,9 +39,10 @@ export class FavoritesComponent implements OnInit {
     this.favoritesService.removeFavorite(favorite.city, favorite.state).subscribe({
       next: () => {
         this.loadFavorites();
+        this.setErrorMessage.emit('');
       },
       error: (error) => {
-        this.errorMessage = error.error.error || 'An error occurred while removing favorite.';
+        this.setErrorMessage.emit('An error occurred while removing favorite.');
       },
     });
   }

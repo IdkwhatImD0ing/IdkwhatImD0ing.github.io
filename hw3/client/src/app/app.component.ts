@@ -9,6 +9,7 @@ import { SearchResult } from './models';
 export class AppComponent {
   searchResult: SearchResult | null = null;
   activeTab = 1;
+  errorMessage: string = '';
 
   onSearchCompleted(result: SearchResult): void {
     this.searchResult = result;
@@ -33,5 +34,9 @@ export class AppComponent {
   onClear(): void {
     this.searchResult = null;
     this.activeTab = 1;
+  }
+
+  setErrorMessage(message: any): void {
+    this.errorMessage = message;
   }
 }

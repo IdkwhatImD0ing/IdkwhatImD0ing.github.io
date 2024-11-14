@@ -7,7 +7,7 @@ import { UuidService } from './uuid.service';
   providedIn: 'root',
 })
 export class FavoritesService {
-  private apiUrl = 'http://localhost:3000';
+  private apiUrl = 'https://express-server-205907697136.us-central1.run.app/';
   constructor(private http: HttpClient, private uuidService: UuidService) { }
 
   checkFavorite(city: string, state: string): Observable<any> {

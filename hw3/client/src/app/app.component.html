@@ -21,6 +21,8 @@
             *ngIf="searchResult"
             [searchResult]="searchResult"
             (resultsLoaded)="onResultsLoaded()"
+            (setErrorMessage)="setErrorMessage($event)"
+            [errorMessage]="errorMessage"
           ></app-results>
         </ng-template>
       </li>
@@ -31,6 +33,8 @@
         <ng-template ngbNavContent>
           <app-favorites
             (favoriteSelected)="onFavoriteSelected($event)"
+            (setErrorMessage)="setErrorMessage($event)"
+            [errorMessage]="errorMessage"
           ></app-favorites>
         </ng-template>
       </li>

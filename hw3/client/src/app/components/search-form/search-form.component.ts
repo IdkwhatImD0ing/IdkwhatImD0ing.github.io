@@ -86,7 +86,6 @@ export class SearchFormComponent implements OnInit {
         console.error('Error obtaining location:', error);
         this.isFetchingLocation = false;
         this.searchForm.get('currentLocation')?.setValue(false);
-        alert('Failed to fetch location information.');
       });
 
 
