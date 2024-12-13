@@ -177,6 +177,31 @@ app.delete('/favorites/remove', async (req, res) => {
   }
 })
 
+app.delete('/favorites', async (req, res) => {
+  const {uuid, city, state} = req.query
+
+  if (!uuid || !city || !state) {
+    return res
+      .status(400)
+      .json({error: 'Missing uuid, city, or state in query parameters.'})
+  }
+
+  try {
+    const deletedFavorite = await Favorite.findOneAndDelete({uuid, city, state})
+    if (deletedFavorite) {
+      return res.json({
+        message: 'Favorite removed successfully.',
+        favorite: deletedFavorite,
+      })
+    } else {
+      return res.status(404).json({error: 'Favorite not found.'})
+    }
+  } catch (error) {
+    console.error('Error removing favorite:', error)
+    return res.status(500).json({error: 'Internal server error.'})
+  }
+})
+
 app.get('/favorites', async (req, res) => {
   const {uuid} = req.query
 
